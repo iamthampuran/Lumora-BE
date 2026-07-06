@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  lumora.api:
+    image: ${DOCKER_REGISTRY-}lumoraapi
+    build:
+      context: .
+      dockerfile: Lumora.Api/Dockerfile
+    depends_on:
+      - postgres
+    networks:
+      - lumina_network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: lumina_postgres
+    environment:
+      POSTGRES_DB: lumina_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lumina_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: lumina_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - lumina_network
+
+volumes:
+  postgres_data:
+
+networks:
+  lumina_network:
