@@ -18,6 +18,14 @@ public static class StudioProfileConfiguration
         entity.Property(e => e.Phone)
             .HasMaxLength(20);
 
+        entity.Property(s => s.MinPrice)
+            .IsRequired()
+            .HasPrecision(18, 2); // 18 total digits, 2 decimal places
+
+        entity.Property(s => s.MaxPrice)
+            .IsRequired()
+            .HasPrecision(18, 2);
+
 
         entity.OwnsOne(e => e.Location, lo => lo.ToJson());
         entity.OwnsOne(e => e.ServiceRadius, sr => sr.ToJson());

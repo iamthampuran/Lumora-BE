@@ -4,7 +4,6 @@ using Lumora.Domain.Entities.Event;
 using Lumora.Domain.Entities.Payments;
 using Lumora.Domain.Entities.Reviews;
 using Lumora.Domain.Entities.Studio;
-using Lumora.Domain.Entities.Tag;
 
 namespace Lumora.Domain.Entities.Identity;
 
@@ -24,6 +23,8 @@ public class StudioProfile : BaseEntity
     public decimal StartingPrice { get; set; }
     public decimal? AverageRating { get; set; }
     public int ReviewCount { get; set; }
+    public decimal MinPrice { get; set; }
+    public decimal MaxPrice { get; set; }
 
     //navigation
     public virtual User? User { get; set; }
