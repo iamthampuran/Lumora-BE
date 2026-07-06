@@ -26,6 +26,7 @@ public class AppDbContext : DbContext
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Gallery> Galleries { get; set; }
     public DbSet<Review> Reviews { get; set; }
+    public DbSet<PortfolioImage> PortfolioImages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,6 +43,7 @@ public class AppDbContext : DbContext
         modelBuilder.ConfigurePayment();
         modelBuilder.ConfigureGallery();
         modelBuilder.ConfigureReview();
+        modelBuilder.ConfigurePortoflioImage();
 
     }
 

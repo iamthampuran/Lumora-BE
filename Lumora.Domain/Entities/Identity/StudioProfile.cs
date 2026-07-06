@@ -32,6 +32,8 @@ public class StudioProfile : BaseEntity
     public virtual ICollection<Inquiry> Inquiries { get; set; } = [];
     public virtual ICollection<Payment> Payments { get; set; } = [];
     public virtual ICollection<Review> Reviews { get; set; } = [];
+    public virtual ICollection<PortfolioImage> PortfolioImages { get; set; } = [];
+
 
 
     //Methods
