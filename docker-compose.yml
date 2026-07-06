@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  lumora.api:
+    image: ${DOCKER_REGISTRY-}lumoraapi
+    build:
+      context: .
+      dockerfile: Lumora.Api/Dockerfile
+    depends_on:
+      - postgres
+      - minio
+    networks:
+      - lumina_network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: lumina_postgres
+    environment:
+      POSTGRES_DB: lumina_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lumina_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: lumina_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - lumina_network
+
+  minio:
+    image: minio/minio:latest
+    container_name: lumina_minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - lumina_network
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  lumina_network:
