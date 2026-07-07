@@ -92,7 +92,7 @@ namespace Lumora.Infrastructure.Migrations
 
                     b.HasIndex("Status");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Event.Gallery", b =>
@@ -163,7 +163,7 @@ namespace Lumora.Infrastructure.Migrations
                     b.HasIndex("InquiryId")
                         .IsUnique();
 
-                    b.ToTable("Galleries");
+                    b.ToTable("Galleries", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Event.Inquiry", b =>
@@ -236,7 +236,7 @@ namespace Lumora.Infrastructure.Migrations
                     b.HasIndex("StudioId", "EventId", "ConsumerId")
                         .IsUnique();
 
-                    b.ToTable("Inquiries");
+                    b.ToTable("Inquiries", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Identity.ConsumerProfile", b =>
@@ -289,7 +289,7 @@ namespace Lumora.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("ConsumerProfiles");
+                    b.ToTable("ConsumerProfiles", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Identity.StudioProfile", b =>
@@ -366,7 +366,7 @@ namespace Lumora.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("StudioProfiles");
+                    b.ToTable("StudioProfiles", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Identity.User", b =>
@@ -429,7 +429,7 @@ namespace Lumora.Infrastructure.Migrations
 
                     b.HasIndex("Role");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Payments.Payment", b =>
@@ -523,7 +523,7 @@ namespace Lumora.Infrastructure.Migrations
 
                     b.HasIndex("StudioProfileId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Reviews.Review", b =>
@@ -599,7 +599,7 @@ namespace Lumora.Infrastructure.Migrations
 
                     b.HasIndex("StudioProfileId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Studio.Employee", b =>
@@ -655,7 +655,7 @@ namespace Lumora.Infrastructure.Migrations
                     b.HasIndex("Email", "Phone")
                         .IsUnique();
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Studio.PortfolioImage", b =>
@@ -706,7 +706,7 @@ namespace Lumora.Infrastructure.Migrations
 
                     b.HasIndex("StudioId", "DisplayOrder");
 
-                    b.ToTable("PortfolioImages");
+                    b.ToTable("PortfolioImages", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Tag.Tag", b =>
@@ -745,7 +745,7 @@ namespace Lumora.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("StudioTags", b =>
@@ -760,7 +760,7 @@ namespace Lumora.Infrastructure.Migrations
 
                     b.HasIndex("TagsId");
 
-                    b.ToTable("StudioTags");
+                    b.ToTable("StudioTags", (string)null);
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Event.Event", b =>
@@ -780,29 +780,6 @@ namespace Lumora.Infrastructure.Migrations
                         .HasForeignKey("SelectedStudioId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.OwnsOne("Lumora.Domain.Entities.Common.ValueObjects.Coordinates", "Location", b1 =>
-                        {
-                            b1.Property<Guid>("EventId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<double>("Latitude")
-                                .HasColumnType("double precision");
-
-                            b1.Property<double>("Longitude")
-                                .HasColumnType("double precision");
-
-                            b1.HasKey("EventId");
-
-                            b1.ToTable("Events");
-
-                            b1
-                                .ToJson("Location")
-                                .HasColumnType("jsonb");
-
-                            b1.WithOwner()
-                                .HasForeignKey("EventId");
-                        });
-
                     b.OwnsOne("Lumora.Domain.Entities.Event.ValueObjects.EventCategory", "EventCategory", b1 =>
                         {
                             b1.Property<Guid>("EventId")
@@ -820,7 +797,30 @@ namespace Lumora.Infrastructure.Migrations
 
                             b1.HasKey("EventId");
 
-                            b1.ToTable("Events");
+                            b1.ToTable("Events", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("EventId");
+                        });
+
+                    b.OwnsOne("Lumora.Domain.Entities.Common.ValueObjects.Coordinates", "Location", b1 =>
+                        {
+                            b1.Property<Guid>("EventId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<double>("Latitude")
+                                .HasColumnType("double precision");
+
+                            b1.Property<double>("Longitude")
+                                .HasColumnType("double precision");
+
+                            b1.HasKey("EventId");
+
+                            b1.ToTable("Events", (string)null);
+
+                            b1
+                                .ToJson("Location")
+                                .HasColumnType("jsonb");
 
                             b1.WithOwner()
                                 .HasForeignKey("EventId");
@@ -914,29 +914,6 @@ namespace Lumora.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("Lumora.Domain.Entities.Common.ValueObjects.ServiceRadius", "ServiceRadius", b1 =>
-                        {
-                            b1.Property<Guid>("StudioProfileId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<double>("Distance")
-                                .HasColumnType("double precision");
-
-                            b1.Property<int>("RadiusType")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("StudioProfileId");
-
-                            b1.ToTable("StudioProfiles");
-
-                            b1
-                                .ToJson("ServiceRadius")
-                                .HasColumnType("jsonb");
-
-                            b1.WithOwner()
-                                .HasForeignKey("StudioProfileId");
-                        });
-
                     b.OwnsOne("Lumora.Domain.Entities.Common.ValueObjects.Coordinates", "Location", b1 =>
                         {
                             b1.Property<Guid>("StudioProfileId")
@@ -950,10 +927,33 @@ namespace Lumora.Infrastructure.Migrations
 
                             b1.HasKey("StudioProfileId");
 
-                            b1.ToTable("StudioProfiles");
+                            b1.ToTable("StudioProfiles", (string)null);
 
                             b1
                                 .ToJson("Location")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StudioProfileId");
+                        });
+
+                    b.OwnsOne("Lumora.Domain.Entities.Common.ValueObjects.ServiceRadius", "ServiceRadius", b1 =>
+                        {
+                            b1.Property<Guid>("StudioProfileId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<double>("Distance")
+                                .HasColumnType("double precision");
+
+                            b1.Property<int>("RadiusType")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("StudioProfileId");
+
+                            b1.ToTable("StudioProfiles", (string)null);
+
+                            b1
+                                .ToJson("ServiceRadius")
                                 .HasColumnType("jsonb");
 
                             b1.WithOwner()
@@ -993,7 +993,7 @@ namespace Lumora.Infrastructure.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
 
                             b1
                                 .ToJson("SuspensionInfo")
@@ -1102,7 +1102,7 @@ namespace Lumora.Infrastructure.Migrations
 
                             b1.HasKey("EmployeeId");
 
-                            b1.ToTable("Employees");
+                            b1.ToTable("Employees", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("EmployeeId");

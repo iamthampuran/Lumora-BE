@@ -24,6 +24,7 @@ public static class InfrastructureServiceRegistration
 
         //repository registration
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped<IStudioRepository, StudioRepository>();
 
         return services;
 
