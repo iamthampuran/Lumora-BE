@@ -26,6 +26,9 @@ public static class StudioProfileConfiguration
             .IsRequired()
             .HasPrecision(18, 2);
 
+        entity.Property(e => e.UserId)
+            .IsRequired();
+
 
         entity.OwnsOne(e => e.Location, lo => lo.ToJson());
         entity.OwnsOne(e => e.ServiceRadius, sr => sr.ToJson());
