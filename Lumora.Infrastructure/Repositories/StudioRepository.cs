@@ -57,7 +57,7 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                     studio.CoverImageUrl),
 
                 RatingStats = new(
-                    0,
+                    studio.Reviews.Average(r => r.Rating),
                     studio.Reviews.Count(),
                     studio.Employees.Count(),
                     studio.Inquiries.Count(i =>
