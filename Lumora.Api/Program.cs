@@ -13,6 +13,16 @@ builder.Services.AddSwaggerGen();
 builder.Host.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontEnd", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") //replace with your front-end url.
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,6 +33,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontEnd");
 
 app.UseAuthorization();
 
