@@ -1,6 +1,8 @@
 ﻿using Ardalis.Result;
+using Lumora.Application.Configuration;
 using Lumora.Application.Contracts.Persistence;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Lumora.Application.Features.Studio.Queries.GetStudioById;
 
