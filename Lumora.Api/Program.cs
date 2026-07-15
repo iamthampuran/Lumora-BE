@@ -1,4 +1,5 @@
 using Lumora.Application;
+using Lumora.Application.Configuration;
 using Lumora.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,14 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddOptions<AppSettingsConfiguration>()
+    .Configure<IConfiguration>( (settings, configuration) =>
+    {
+        configuration.Bind(settings);
+    })
+    .ValidateOnStart()
+    .ValidateDataAnnotations();
 
 builder.Host.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
