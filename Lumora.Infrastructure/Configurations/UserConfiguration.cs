@@ -34,6 +34,9 @@ public static class UserConfiguration
             si.ToJson();
         });
 
+        entity.Property(e => e.Salt)
+            .IsRequired();
+
         //index
         entity.HasIndex(e => e.Email)
             .IsUnique();

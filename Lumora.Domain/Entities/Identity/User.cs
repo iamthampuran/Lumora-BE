@@ -10,6 +10,7 @@ public class User : BaseEntity
     public string PasswordHash { get; private set; } = null!;
     public UserRole Role { get; private set; }
     public DateTime? LastLoginAt { get; set; }
+    public byte[] Salt { get; private set; } = null!;
 
     public bool IsTwoFactorEnabled { get; private set; }
     public string? TwoFactorSecret { get; private set; }    //encrypted
