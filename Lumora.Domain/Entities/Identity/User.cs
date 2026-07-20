@@ -22,6 +22,7 @@ public class User : BaseEntity
 
     public virtual ConsumerProfile? ConsumerProfile { get; private set; }
     public virtual StudioProfile? StudioProfile { get; private set; }
+    public virtual List<RefreshToken> RefreshTokens { get; private set; } = [];
 
     public void SetPasswordHash(string hash)
         => this.PasswordHash = hash; 
