@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ardalis.Result" Version="10.1.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />
     <PackageReference Include="WolverineFx" Version="3.13.3" />
     <PackageReference Include="WolverineFx.FluentValidation" Version="3.13.3" />
   </ItemGroup>
