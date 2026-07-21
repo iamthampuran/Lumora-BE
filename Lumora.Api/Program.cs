@@ -1,3 +1,4 @@
+using Lumora.Api.Handlers;
 using Lumora.Application;
 using Lumora.Application.Configuration;
 using Lumora.Infrastructure;
@@ -18,6 +19,9 @@ builder.Services.AddOptions<AppSettingsConfiguration>()
     })
     .ValidateOnStart()
     .ValidateDataAnnotations();
+
+builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Host.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -45,7 +49,10 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontEnd");
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 
