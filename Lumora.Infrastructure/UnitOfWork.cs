@@ -51,6 +51,7 @@ public class UnitOfWork(AppDbContext appDbContext, IHttpContextAccessor httpCont
                     entry.Entity.CreatedBy = caller;
                     entry.Entity.ModifiedAt = DateTime.UtcNow;
                     entry.Entity.ModifiedBy = caller;
+                    entry.Entity.IsActive = true;
                     break;
             }
         }
