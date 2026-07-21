@@ -18,14 +18,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         return Task.CompletedTask;
     }
 
-    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await _appDbContext.Set<T>().AnyAsync(predicate);
+        return await _appDbContext.Set<T>().AnyAsync(predicate, cancellationToken);
     }
 
-    public async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
+    public async Task<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await _appDbContext.Set<T>().CountAsync(predicate);
+        return await _appDbContext.Set<T>().CountAsync(predicate, cancellationToken);
     }
 
     public void Delete(T entity)
@@ -38,14 +38,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         _appDbContext.Set<T>().RemoveRange(entities);
     }
 
-    public async Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate)
+    public async Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await _appDbContext.Set<T>().Where(predicate).ToListAsync();
+        return await _appDbContext.Set<T>().Where(predicate).ToListAsync(cancellationToken);
 
     }
 
-    public async Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, 
-        List<Expression<Func<T, object>>>? includes = null, bool disableTracking = true, bool includeSoftDeleted = false)
+    public async Task<IReadOnlyList<T>> GetAsyncc(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, 
+        List<Expression<Func<T, object>>>? includes = null, bool disableTracking = true, bool includeSoftDeleted = false, CancellationToken cancellationToken)
     {
         IQueryable<T> query =  _appDbContext.Set<T>();
         if (disableTracking)
@@ -71,18 +71,18 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         return await query.ToListAsync();
     }
 
-    public async Task<T?> GetByIdAsync(Guid id)
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _appDbContext.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
+        return await _appDbContext.Set<T>().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<T?> GetFirstAsync(Expression<Func<T, bool>> predicate)
+    public async Task<T?> GetFirstAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await _appDbContext.Set<T>().FirstOrDefaultAsync(predicate);
+        return await _appDbContext.Set<T>().FirstOrDefaultAsync(predicate, cancellationToken);
     }
 
     public async Task<T?> GetFirstAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, 
-        IOrderedQueryable<T>>? orderBy = null, List<Expression<Func<T, object>>>? includes = null, bool disableTracking = true)
+        IOrderedQueryable<T>>? orderBy = null, List<Expression<Func<T, object>>>? includes = null, bool disableTracking = true, CancellationToken cancellationToken)
     {
         IQueryable<T> query = _appDbContext.Set<T>();
         if (disableTracking)
