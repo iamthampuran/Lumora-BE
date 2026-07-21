@@ -16,7 +16,7 @@
     </PackageReference>
     <PackageReference Include="Minio" Version="7.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="System.Formats.Asn1" Version="9.0.17" />
+    <PackageReference Include="System.Formats.Asn1" Version="10.0.10" />
   </ItemGroup>
 
   <ItemGroup>
