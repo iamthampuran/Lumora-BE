@@ -17,4 +17,8 @@
     <PackageReference Include="WolverineFx.FluentValidation" Version="3.13.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Auth\Queries\" />
+  </ItemGroup>
+
 </Project>
