@@ -43,17 +43,6 @@ public static class UserConfiguration
 
         entity.HasIndex(e => e.Role);
 
-        //navigation
-        entity.HasOne(e => e.ConsumerProfile)
-            .WithOne()
-            .HasForeignKey<ConsumerProfile>(cp => cp.Id)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        entity.HasOne(e => e.StudioProfile)
-            .WithOne()
-            .HasForeignKey<StudioProfile>(sp => sp.Id)
-            .OnDelete(DeleteBehavior.Cascade);
-
         entity.HasQueryFilter(e => e.IsActive && e.DeletedAt == null);
     }
 }

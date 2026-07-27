@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
+using Lumora.Application.Features.Auth.Commands.CreateStudio;
 using Lumora.Application.Features.Auth.Commands.SignupAccount;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -20,5 +21,15 @@ namespace Lumora.Api.Controllers
             return result.ToActionResult(this);
         }
 
+        [HttpPost("create/studio/{userId}")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
+        public async Task<ActionResult<Guid>> CreateUser([FromRoute] Guid userId, [FromBody] CreateStudioCommand command, CancellationToken cancellationToken)
+        {
+            if (userId != command.UserId)
+                return BadRequest();
+            var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
     }
 }

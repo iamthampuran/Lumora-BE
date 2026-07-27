@@ -27,9 +27,9 @@ public static class ConsumerProfileConfiguration
             .HasMaxLength(2048);
 
         //relations
-        entity.HasOne(e => e.User)
-            .WithOne()
-            .HasForeignKey<ConsumerProfile>(e => e.UserId)
+        entity.HasOne(cp => cp.User)
+            .WithOne(u => u.ConsumerProfile)
+            .HasForeignKey<ConsumerProfile>(cp => cp.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         entity.HasQueryFilter(e => e.IsActive && e.DeletedAt != null);

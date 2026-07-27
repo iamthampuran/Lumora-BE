@@ -28,7 +28,6 @@ public class SignupAccountCommandHandler(ILogger<SignupAccountCommandHandler> lo
             PasswordHash = passwordHash,
             Salt = salt,
             Role = command.Role,
-            IsActive = true
         };
 
         userRepository.Add(newUser);

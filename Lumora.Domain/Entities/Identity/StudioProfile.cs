@@ -9,7 +9,7 @@ namespace Lumora.Domain.Entities.Identity;
 
 public class StudioProfile : BaseEntity
 {
-    public Guid UserId { get; private set; }
+    public Guid UserId { get; set; }
     public string StudioName { get; set; } = null!;
     public string? Description { get; set; }
     public string? LogoUrl { get; set; }
