@@ -27,6 +27,7 @@ public class AppDbContext : DbContext
     public DbSet<Gallery> Galleries { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<PortfolioImage> PortfolioImages { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,7 +45,7 @@ public class AppDbContext : DbContext
         modelBuilder.ConfigureGallery();
         modelBuilder.ConfigureReview();
         modelBuilder.ConfigurePortoflioImage();
-
+        modelBuilder.ConfigureRefreshToken();
     }
 
 }

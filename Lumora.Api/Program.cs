@@ -1,3 +1,4 @@
+using Lumora.Api.Handlers;
 using Lumora.Application;
 using Lumora.Application.Configuration;
 using Lumora.Infrastructure;
@@ -19,6 +20,9 @@ builder.Services.AddOptions<AppSettingsConfiguration>()
     .ValidateOnStart()
     .ValidateDataAnnotations();
 
+builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Host.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
@@ -26,7 +30,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontEnd", policy =>
     {
-        policy.WithOrigins("http://localhost:4200") //replace with your front-end url.
+        policy.WithOrigins("https://localhost:4200") //replace with your front-end url.
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
@@ -45,7 +49,10 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontEnd");
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseExceptionHandler();
 
 app.MapControllers();
 

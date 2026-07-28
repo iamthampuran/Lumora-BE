@@ -1,5 +1,6 @@
 ﻿using Lumora.Domain.Entities.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace Lumora.Infrastructure.Configurations;
 
@@ -10,6 +11,9 @@ public static class StudioProfileConfiguration
         var entity = modelBuilder.Entity<StudioProfile>();
 
         entity.HasKey(x => x.Id);
+
+        //entity.Property(x => x.Id)
+        //    .HasValueGenerator<SequentialGuidValueGenerator>();
 
         entity.Property(e => e.StudioName)
             .IsRequired()
@@ -34,7 +38,7 @@ public static class StudioProfileConfiguration
         entity.OwnsOne(e => e.ServiceRadius, sr => sr.ToJson());
 
         entity.HasOne(e => e.User)
-            .WithOne()
+            .WithOne(u => u.StudioProfile)
             .HasForeignKey<StudioProfile>(e => e.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 

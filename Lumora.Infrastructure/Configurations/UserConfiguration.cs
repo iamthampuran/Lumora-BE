@@ -34,22 +34,14 @@ public static class UserConfiguration
             si.ToJson();
         });
 
+        entity.Property(e => e.Salt)
+            .IsRequired();
+
         //index
         entity.HasIndex(e => e.Email)
             .IsUnique();
 
         entity.HasIndex(e => e.Role);
-
-        //navigation
-        entity.HasOne(e => e.ConsumerProfile)
-            .WithOne()
-            .HasForeignKey<ConsumerProfile>(cp => cp.Id)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        entity.HasOne(e => e.StudioProfile)
-            .WithOne()
-            .HasForeignKey<StudioProfile>(sp => sp.Id)
-            .OnDelete(DeleteBehavior.Cascade);
 
         entity.HasQueryFilter(e => e.IsActive && e.DeletedAt == null);
     }

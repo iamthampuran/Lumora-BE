@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Lumora.Application.Contracts.Services;
+using Lumora.Application.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Wolverine;
 using Wolverine.FluentValidation;
@@ -17,5 +20,9 @@ public static class ApplicationServiceRegistration
             options.Discovery.IncludeAssembly(typeof(ApplicationServiceRegistration).Assembly);
         });
 
+        builder.ConfigureServices(services =>
+        {
+            services.AddScoped<IAuthService, AuthService>();
+        });
     }
 }

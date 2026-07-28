@@ -3,6 +3,7 @@ using System;
 using Lumora.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Lumora.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260720071603_RefreshTokensTable")]
+    partial class RefreshTokensTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,7 +245,6 @@ namespace Lumora.Infrastructure.Migrations
             modelBuilder.Entity("Lumora.Domain.Entities.Identity.ConsumerProfile", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Bio")
@@ -328,7 +330,6 @@ namespace Lumora.Infrastructure.Migrations
             modelBuilder.Entity("Lumora.Domain.Entities.Identity.StudioProfile", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<decimal?>("AverageRating")
@@ -448,10 +449,6 @@ namespace Lumora.Infrastructure.Migrations
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<byte[]>("Salt")
-                        .IsRequired()
-                        .HasColumnType("bytea");
 
                     b.Property<string>("TwoFactorBackupCodes")
                         .HasColumnType("text");
@@ -923,8 +920,14 @@ namespace Lumora.Infrastructure.Migrations
 
             modelBuilder.Entity("Lumora.Domain.Entities.Identity.ConsumerProfile", b =>
                 {
-                    b.HasOne("Lumora.Domain.Entities.Identity.User", "User")
+                    b.HasOne("Lumora.Domain.Entities.Identity.User", null)
                         .WithOne("ConsumerProfile")
+                        .HasForeignKey("Lumora.Domain.Entities.Identity.ConsumerProfile", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lumora.Domain.Entities.Identity.User", "User")
+                        .WithOne()
                         .HasForeignKey("Lumora.Domain.Entities.Identity.ConsumerProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -945,8 +948,14 @@ namespace Lumora.Infrastructure.Migrations
 
             modelBuilder.Entity("Lumora.Domain.Entities.Identity.StudioProfile", b =>
                 {
-                    b.HasOne("Lumora.Domain.Entities.Identity.User", "User")
+                    b.HasOne("Lumora.Domain.Entities.Identity.User", null)
                         .WithOne("StudioProfile")
+                        .HasForeignKey("Lumora.Domain.Entities.Identity.StudioProfile", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Lumora.Domain.Entities.Identity.User", "User")
+                        .WithOne()
                         .HasForeignKey("Lumora.Domain.Entities.Identity.StudioProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

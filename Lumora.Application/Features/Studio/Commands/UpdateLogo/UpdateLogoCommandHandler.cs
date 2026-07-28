@@ -12,7 +12,7 @@ public class UpdateLogoCommandHandler(ILogger<UpdateLogoCommandHandler> logger, 
     public async Task<Result<string>> Handle(UpdateLogoCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("Handling command - {@command}", nameof(UpdateLogoCommand));
-        var studio = await studioRepository.GetByIdAsync(command.StudioId);
+        var studio = await studioRepository.GetByIdAsync(command.StudioId, cancellationToken);
         if (studio == null)
         {
             return Result.NotFound();
