@@ -24,4 +24,20 @@ public class ConsumerProfile : BaseEntity
         Phone = phone;
         Bio = bio;
     }
+
+    private ConsumerProfile() { }
+
+    public ConsumerProfile(
+        Guid userId,
+        string fullName,
+        string? phone,
+        string? photoUrl,
+        string? bio)
+    {
+        UserId = userId;
+        FullName = fullName;
+        Phone = phone;
+        PhotoUrl = photoUrl;
+        Bio = bio;
+    }
 }
