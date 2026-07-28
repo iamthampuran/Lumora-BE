@@ -1,0 +1,36 @@
+﻿using Ardalis.Result;
+using Lumora.Application.Contracts.Common;
+using Lumora.Application.Contracts.Persistence;
+using Lumora.Domain.Entities.Identity;
+using Microsoft.Extensions.Logging;
+
+namespace Lumora.Application.Features.Auth.Commands.CreateConsumer;
+
+public class CreateConsumerCommandHandler(ILogger<CreateConsumerCommandHandler> logger, IUnitOfWork unitOfWork, IGenericRepository<ConsumerProfile> consumerProfileRepository, 
+    IUserRepository userRepository)
+{
+    public async Task<Result<Guid>> Handle(CreateConsumerCommand command, CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Handling command {@command}", nameof(CreateConsumerCommand));
+        var user = await userRepository.GetByIdAsync(command.UserId, cancellationToken);
+        if (user == null)
+        {
+            return Result.NotFound("User Not Found");
+        }
+
+        if (user.Role != Domain.Enums.UserRole.Studio)
+            return Result.Error("User had not selected consumer as role.");
+
+        var doesConsumerExists = await consumerProfileRepository.AnyAsync(cp => cp.UserId == command.UserId, cancellationToken);
+        if (doesConsumerExists)
+        {
+            return Result.Conflict("A consumer with same userId already exists!");
+        }
+
+        var consumerProfile = new ConsumerProfile(command.UserId, command.FullName, command.PhoneNumber, command.PhotoUrl, command.Bio);
+        consumerProfileRepository.Add(consumerProfile);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Success(consumerProfile.Id);
+    }
+}
