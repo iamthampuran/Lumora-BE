@@ -6,11 +6,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Lumora.Application.Features.Auth.Commands.CreateStudio;
 
-public class CreateStudioCommandHandler(IUnitOfWork unitOfWork, ILogger<CreateStudioCommandHandler> logger, IGenericRepository<StudioProfile> studioRepository)
+public class CreateStudioCommandHandler(IUnitOfWork unitOfWork, ILogger<CreateStudioCommandHandler> logger, IGenericRepository<StudioProfile> studioRepository, IUserRepository userRepository)
 {
    public async Task<Result<Guid>> Handle(CreateStudioCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("Handling command - {@command}", nameof(CreateStudioCommand));
+
+        var user = await userRepository.GetByIdAsync(command.UserId, cancellationToken);
+        if (user == null)
+        {
+            return Result.NotFound("User Not Found");
+        }
+
+        if (user.Role != Domain.Enums.UserRole.Consumer)
+            return Result.Error("User had not selected consumer as role.");
+
         var doesStudioExists = await studioRepository.AnyAsync(st => st.UserId == command.UserId, cancellationToken);
         if (doesStudioExists)
             return Result.Conflict("A studio for this user already exists");

@@ -8,7 +8,9 @@ public class CreateStudioCommandValidator : AbstractValidator<CreateStudioComman
     {
         RuleFor(x => x.Phone)
             .NotEmpty()
-            .WithMessage("Phone is required");
+            .WithMessage("Phone is required")
+            .Matches(@"^(\+91|91)?[6-9]\d{9}$")
+            .WithMessage("Please enter a valid Indian phone number.");
 
         RuleFor(x => x.MaxPrice)
             .NotEmpty()
