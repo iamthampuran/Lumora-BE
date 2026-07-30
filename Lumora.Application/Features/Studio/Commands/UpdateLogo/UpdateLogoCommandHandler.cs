@@ -21,8 +21,13 @@ public class UpdateLogoCommandHandler(ILogger<UpdateLogoCommandHandler> logger, 
         if (studio.LogoUrl != null)
             await minioService.DeleteFileAsync(studio.LogoUrl, cancellationToken);
 
-        var result = await minioService.UploadFileAsync(command.File, "studio", command.StudioId.ToString(), command.ContentType, 
-            FileServiceHelper.GetFileNameWithExtension("logo.jpg"), cancellationToken);
+        var result = await minioService.UploadFileAsync(
+            command.File, 
+            MessageConstants.ImageTypes.Logo, 
+            command.StudioId.ToString(), 
+            FileServiceHelper.GetFileNameWithExtension("logo.jpg"), 
+            cancellationToken);
+            
         studio.LogoUrl = result.fileKey;
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Result.Success(result.presignedUrl);

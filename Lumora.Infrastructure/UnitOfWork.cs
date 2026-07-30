@@ -65,6 +65,6 @@ public class UnitOfWork(AppDbContext appDbContext, IHttpContextAccessor httpCont
         var userName = identity?.FindFirst("name")?.Value;
         var email = identity?.FindFirst("email")?.Value;
 
-        return userName != null && email != null ? $"{userName} {email}" : string.Empty;
+        return userName != null && email != null ? $"{userName} {email}" : "Program";
     }
 }

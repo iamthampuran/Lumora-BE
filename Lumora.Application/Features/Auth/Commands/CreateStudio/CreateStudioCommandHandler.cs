@@ -18,8 +18,8 @@ public class CreateStudioCommandHandler(IUnitOfWork unitOfWork, ILogger<CreateSt
             return Result.NotFound("User Not Found");
         }
 
-        if (user.Role != Domain.Enums.UserRole.Consumer)
-            return Result.Error("User had not selected consumer as role.");
+        if (user.Role != Domain.Enums.UserRole.Studio)
+            return Result.Error("User had not selected studio as role.");
 
         var doesStudioExists = await studioRepository.AnyAsync(st => st.UserId == command.UserId, cancellationToken);
         if (doesStudioExists)
@@ -30,7 +30,7 @@ public class CreateStudioCommandHandler(IUnitOfWork unitOfWork, ILogger<CreateSt
             StudioName = command.StudioName,
             UserId = command.UserId,
             Description = command.Description,
-            Phone = command.Phone,
+            Phone = command.PhoneNumber,
             Website = command.Website,
             Location = new Domain.Entities.Common.ValueObjects.Coordinates(command.Latitude, command.Longitude),
             ServiceRadius = new Domain.Entities.Common.ValueObjects.ServiceRadius()

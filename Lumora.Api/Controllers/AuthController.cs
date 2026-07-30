@@ -34,16 +34,35 @@ namespace Lumora.Api.Controllers
         }
 
         [HttpPost("create/consumer/{userId}")]
+        [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.Conflict)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-
-        public async Task<ActionResult<Guid>> CreateConsumer([FromRoute] Guid userId, [FromBody] CreateConsumerCommand command, CancellationToken cancellationToken)
+        public async Task<ActionResult<Guid>> CreateConsumer([FromRoute] Guid userId, [FromForm] CreateConsumerDto request, IFormFile? formFile, CancellationToken cancellationToken)
         {
-            if (userId != command.UserId)
-                return BadRequest("UserId found in route and body are different.");
-            var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken); 
+            if (userId != request.UserId)
+                return BadRequest("UserId found in route and form are different.");
+
+            var command = new CreateConsumerCommand
+            {
+                UserId = request.UserId,
+                FullName = request.FullName,
+                PhoneNumber = request.PhoneNumber,
+                Bio = request.Bio,
+                FileDetails = formFile is not null ? new FileDetails(formFile.OpenReadStream(), formFile.ContentType) : null
+            };
+
+            var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken);
             return result.ToActionResult(this);
+        }
+
+        public class CreateConsumerRequest
+        {
+            public Guid UserId { get; init; }
+            public string FullName { get; init; } = null!;
+            public string PhoneNumber { get; init; } = null!;
+            public string? Bio { get; init; }
+            public IFormFile? FormFile { get; init; }
         }
     }
 }

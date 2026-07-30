@@ -6,7 +6,7 @@ public class CreateStudioCommandValidator : AbstractValidator<CreateStudioComman
 {
     public CreateStudioCommandValidator()
     {
-        RuleFor(x => x.Phone)
+        RuleFor(x => x.PhoneNumber)
             .NotEmpty()
             .WithMessage("Phone is required")
             .Matches(@"^(\+91|91)?[6-9]\d{9}$")
