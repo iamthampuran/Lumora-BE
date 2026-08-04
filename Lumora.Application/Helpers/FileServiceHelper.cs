@@ -7,11 +7,11 @@ public static class FileServiceHelper
         return $"{bucketName}/studio/{studioId}/logo/";
     }
 
-    public static string GetFileNameWithExtension(string fileName, string contentType = "images/jpeg")
+    public static string GetFileNameWithExtension(string fileName, string contentType = "image/jpeg")
     {
         var extension = contentType.ToLowerInvariant() switch
         {
-            "image/jpgeg" => ".jpg",
+            "image/jpeg" => ".jpg",
             "image/png" => ".png",
             "image/webp" => ".webp",
             "image/gif" => ".gif",

@@ -8,6 +8,7 @@ public static class MessageConstants
     {
         public const string Studios = "studio";
         public const string Users = "users";
+        public const string Consumer = "consumer";
     }
 
     public static class ImageTypes
