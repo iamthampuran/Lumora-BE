@@ -2,6 +2,7 @@
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Auth.Commands.CreateConsumer;
 using Lumora.Application.Features.Auth.Commands.CreateStudio;
+using Lumora.Application.Features.Auth.Commands.SignInUser;
 using Lumora.Application.Features.Auth.Commands.SignupAccount;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -56,13 +57,14 @@ namespace Lumora.Api.Controllers
             return result.ToActionResult(this);
         }
 
-        public class CreateConsumerRequest
+        [HttpPost("signin")]
+        [ProducesResponseType(typeof(SignInUserResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<SignInUserResponse>> SignIn([FromBody] SignInUserCommand command, CancellationToken cancellationToken)
         {
-            public Guid UserId { get; init; }
-            public string FullName { get; init; } = null!;
-            public string PhoneNumber { get; init; } = null!;
-            public string? Bio { get; init; }
-            public IFormFile? FormFile { get; init; }
+            var result = await messageBus.InvokeAsync<Result<SignInUserResponse>> (command, cancellationToken);
+            return result.ToActionResult(this);
         }
     }
 }
