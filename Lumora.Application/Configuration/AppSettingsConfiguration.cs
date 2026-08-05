@@ -52,7 +52,7 @@ public class JwtConfig
     [Required]
     public string SecretKey { get; set; } = null!;
     [Required]
-    public int AccessTokenExpiryMinutes;
+    public int AccessTokenExpiryMinutes { get; set; } 
     [Required]
-    public int RefreshTokenExpiryHours;
+    public int RefreshTokenExpiryHours { get; set; }
 }
