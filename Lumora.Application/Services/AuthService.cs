@@ -29,16 +29,28 @@ public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTok
         };
 
         if (user.Role == UserRole.Studio && user.StudioProfile != null)
-            claims.Add(new("studioId", user.StudioProfile.Id.ToString()));
-
-        var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(options.Value.Security.Jwt.AccessTokenExpiryMinutes),
-            Issuer = "lumora",
-            Audience = "lumora-api",
-            SigningCredentials = new(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256Signature)
-        };
+            claims.Add(new("studioId", user.StudioProfile.Id.ToString()));
+            claims.Add(new(ClaimTypes.Name, user.StudioProfile.StudioName));
+            //user.StudioProfile.LogoUrl ?? claims.Add(new("logoUrl", user.StudioProfile.LogoUrl)) ;
+            if (user.StudioProfile.LogoUrl != null)
+                claims.Add( new Claim("logoUrl", user.StudioProfile.LogoUrl));
+        }
+        else if (user.Role == UserRole.Consumer && user.ConsumerProfile != null) 
+            {
+            claims.Add(new(ClaimTypes.Name, user.ConsumerProfile.FullName));
+            if (user.ConsumerProfile.PhotoUrl != null)
+                claims.Add(new("avatarUrl", user.ConsumerProfile.PhotoUrl));
+        }
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddMinutes(options.Value.Security.Jwt.AccessTokenExpiryMinutes),
+                Issuer = "lumora",
+                Audience = "lumora-api",
+                SigningCredentials = new(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256Signature)
+            };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);

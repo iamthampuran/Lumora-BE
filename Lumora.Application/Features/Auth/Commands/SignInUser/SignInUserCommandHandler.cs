@@ -12,7 +12,7 @@ public class SignInUserCommandHandler(IUserRepository userRepository, ILogger<Si
     {
         logger.LogInformation("Handling command - {@command}", nameof(SignInUserCommand));
 
-        var user = await userRepository.GetFirstAsync(user => user.Email == command.Email, cancellationToken);
+        var user = await userRepository.GetFirstAsync(user => user.Email == command.Email, null, [u => u.ConsumerProfile, u => u.StudioProfile], true , cancellationToken);
         if (user == null)
         {
             return Result.NotFound("User with the email was not found");
