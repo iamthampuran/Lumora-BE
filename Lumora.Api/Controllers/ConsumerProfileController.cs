@@ -1,6 +1,9 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Consumer.Commands.AddProfilePicture;
+using Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
+using Lumora.Application.Helpers;
+using Lumora.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Wolverine;
@@ -18,6 +21,17 @@ public class ConsumerProfileController(IMessageBus messageBus) : ControllerBase
     {
         var command = new AddProfilePictureCommand(file.OpenReadStream(), id, file.ContentType);
         var result = await messageBus.InvokeAsync<Result<string>>(command, cancellationToken);
+        return result.ToActionResult(this);
+    }
+
+    [HttpGet("{id}/dashboard/events")]
+    [ProducesResponseType(typeof(GetDashboardTableQueryResponse), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<GetDashboardTableQueryResponse>> GetConsumerDashboard([FromRoute] Guid id, [FromQuery] EventStatus eventStatus,
+        [FromQuery] PaginationOptions? paginationOptions,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetDashboardTableQuery(id, eventStatus, paginationOptions ?? new PaginationOptions());
+        var result = await messageBus.InvokeAsync<Result<GetDashboardTableQueryResponse>>(query, cancellationToken);
         return result.ToActionResult(this);
     }
 

@@ -38,6 +38,7 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IStudioRepository, StudioRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();  
+        services.AddScoped<IEventRepository, EventRepository>();
 
         return services;
 
