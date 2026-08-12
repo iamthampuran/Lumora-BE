@@ -32,6 +32,6 @@ public static class ConsumerProfileConfiguration
             .HasForeignKey<ConsumerProfile>(cp => cp.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        entity.HasQueryFilter(e => e.IsActive && e.DeletedAt != null);
+        entity.HasQueryFilter(e => e.IsActive && e.DeletedAt == null);
     }
 }

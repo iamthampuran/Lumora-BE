@@ -29,7 +29,20 @@ public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTok
         };
 
         if (user.Role == UserRole.Studio && user.StudioProfile != null)
+        {
             claims.Add(new("studioId", user.StudioProfile.Id.ToString()));
+            claims.Add(new(ClaimTypes.Name, user.StudioProfile.StudioName));
+            //user.StudioProfile.LogoUrl ?? claims.Add(new("logoUrl", user.StudioProfile.LogoUrl)) ;
+            if (user.StudioProfile.LogoUrl != null)
+                claims.Add(new Claim("logoUrl", user.StudioProfile.LogoUrl));
+        }
+        else if (user.Role == UserRole.Consumer && user.ConsumerProfile != null)
+        {
+            claims.Add(new("consumerId", user.ConsumerProfile.Id.ToString()));
+            claims.Add(new(ClaimTypes.Name, user.ConsumerProfile.FullName));
+            if (user.ConsumerProfile.PhotoUrl != null)
+                claims.Add(new("avatarUrl", user.ConsumerProfile.PhotoUrl));
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -67,7 +80,9 @@ public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTok
             CreatedAt = DateTime.UtcNow
         };
 
-        return (token,  refreshToken);
+        refreshTokenRepository.Add(refreshToken);
+
+        return (token, refreshToken);
     }
 
     public (string passwordHash, byte[] salt) HashPasswordAsync(string passwordPlainText)
