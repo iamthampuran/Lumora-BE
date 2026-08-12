@@ -2,6 +2,7 @@
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Consumer.Commands.AddProfilePicture;
 using Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
+using Lumora.Application.Features.Consumer.Queries.GetInquiryWidget;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,15 @@ public class ConsumerProfileController(IMessageBus messageBus) : ControllerBase
     {
         var query = new GetDashboardTableQuery(id, eventStatus, paginationOptions ?? new PaginationOptions());
         var result = await messageBus.InvokeAsync<Result<GetDashboardTableQueryResponse>>(query, cancellationToken);
+        return result.ToActionResult(this);
+    }
+
+    [HttpGet("{id}/dashboard/inquiries")]
+    [ProducesResponseType(typeof(IEnumerable<GetInquiryWidgetResponse>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<IEnumerable<GetInquiryWidgetResponse>>> GetInquiryWidgetDetails([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await messageBus.InvokeAsync<Result<IEnumerable<GetInquiryWidgetResponse>>>(new GetInquiryWidgetQuery(id), cancellationToken);
         return result.ToActionResult(this);
     }
 

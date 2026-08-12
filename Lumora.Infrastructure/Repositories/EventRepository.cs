@@ -25,11 +25,12 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
         var activeEventsCount = await query.CountAsync(e => e.Status != EventStatus.Created  && e.Status != EventStatus.Complete, cancellationToken);
 
 
-        var newQuery = query.Where(e => e.Status == status)
+        var newQuery = query.Where(e => status == EventStatus.InProgress ? (e.Status != EventStatus.Created && e.Status != EventStatus.Complete) : (e.Status == status))
             .Skip((paginationOptions.PageCount - 1)* paginationOptions.PageSize)
             .Take(paginationOptions.PageSize);
 
         var result = await newQuery.Select(e => new EventDetails(
+                e.Id,
                 e.Title,
                 e.EventDate,
                 e.Location,
