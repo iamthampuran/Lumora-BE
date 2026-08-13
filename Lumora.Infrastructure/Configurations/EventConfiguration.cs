@@ -37,12 +37,6 @@ public static class EventConfiguration
             eo.ToJson();
         });
 
-        entity.OwnsOne(e => e.EventCategory, eo =>
-        {
-            eo.Property(ec => ec.Type).HasColumnName("event_category_type");
-            eo.Property(ec => ec.Value).HasColumnName("event_category_value");
-        });
-
         entity.HasOne(e => e.Consumer)
             .WithMany()
             .HasForeignKey(e => e.ConsumerId)

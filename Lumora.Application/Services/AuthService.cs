@@ -37,7 +37,7 @@ public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTok
             //user.StudioProfile.LogoUrl ?? claims.Add(new("logoUrl", user.StudioProfile.LogoUrl)) ;
             if (user.StudioProfile.LogoUrl != null)
             {
-                var presignedUrl = await minioService.GeneratePresignedUrlAsync(user.StudioProfile.LogoUrl);
+                var presignedUrl = await minioService.GeneratePresignedUrlAsync(user.StudioProfile.LogoUrl, 180);
                 claims.Add(new Claim("logoUrl", presignedUrl));
 
             }
@@ -48,7 +48,7 @@ public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTok
             claims.Add(new(ClaimTypes.Name, user.ConsumerProfile.FullName));
             if (user.ConsumerProfile.PhotoUrl != null)
             {
-                var presignedUrl = await minioService.GeneratePresignedUrlAsync(user.ConsumerProfile.PhotoUrl);
+                var presignedUrl = await minioService.GeneratePresignedUrlAsync(user.ConsumerProfile.PhotoUrl, 180);
                 claims.Add(new("avatarUrl", presignedUrl));
             }
         }

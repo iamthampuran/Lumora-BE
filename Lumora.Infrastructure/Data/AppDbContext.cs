@@ -28,6 +28,7 @@ public class AppDbContext : DbContext
     public DbSet<Review> Reviews { get; set; }
     public DbSet<PortfolioImage> PortfolioImages { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<EventType> EventTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,6 +47,7 @@ public class AppDbContext : DbContext
         modelBuilder.ConfigureReview();
         modelBuilder.ConfigurePortoflioImage();
         modelBuilder.ConfigureRefreshToken();
+        modelBuilder.ConfigureEventType();
     }
 
 }
