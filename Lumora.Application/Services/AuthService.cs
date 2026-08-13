@@ -10,13 +10,15 @@ using System.Text;
 using System.Security.Claims;
 using Lumora.Domain.Enums;
 using Microsoft.IdentityModel.Tokens;
+using System.Threading.Tasks;
 
 
 namespace Lumora.Application.Services;
 
-public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTokenRepository refreshTokenRepository, IGenericRepository<User> userRepository) : IAuthService
+public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTokenRepository refreshTokenRepository, IGenericRepository<User> userRepository,
+    IMinioService minioService) : IAuthService
 {
-    public string GenerateAccessTokenAsync(User user)
+    public async Task<string> GenerateAccessTokenAsync(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var secret = Encoding.ASCII.GetBytes(options.Value.Security.Jwt.SecretKey);
@@ -34,14 +36,21 @@ public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTok
             claims.Add(new(ClaimTypes.Name, user.StudioProfile.StudioName));
             //user.StudioProfile.LogoUrl ?? claims.Add(new("logoUrl", user.StudioProfile.LogoUrl)) ;
             if (user.StudioProfile.LogoUrl != null)
-                claims.Add(new Claim("logoUrl", user.StudioProfile.LogoUrl));
+            {
+                var presignedUrl = await minioService.GeneratePresignedUrlAsync(user.StudioProfile.LogoUrl);
+                claims.Add(new Claim("logoUrl", presignedUrl));
+
+            }
         }
         else if (user.Role == UserRole.Consumer && user.ConsumerProfile != null)
         {
             claims.Add(new("consumerId", user.ConsumerProfile.Id.ToString()));
             claims.Add(new(ClaimTypes.Name, user.ConsumerProfile.FullName));
             if (user.ConsumerProfile.PhotoUrl != null)
-                claims.Add(new("avatarUrl", user.ConsumerProfile.PhotoUrl));
+            {
+                var presignedUrl = await minioService.GeneratePresignedUrlAsync(user.ConsumerProfile.PhotoUrl);
+                claims.Add(new("avatarUrl", presignedUrl));
+            }
         }
 
         var tokenDescriptor = new SecurityTokenDescriptor

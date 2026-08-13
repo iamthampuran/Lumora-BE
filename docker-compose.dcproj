@@ -10,6 +10,8 @@
     <DockerServiceName>lumora.api</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="certs\localhost.key" />
+    <None Include="certs\localhost.pem" />
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>

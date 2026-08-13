@@ -25,10 +25,10 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddHttpContextAccessor();
         services.AddMinio(configureClient => configureClient
-            .WithEndpoint(configuration["Minio:Endpoint"])
-            .WithCredentials(configuration["Minio:AccessKey"], configuration["Minio:SecretKey"])
-            .WithSSL(bool.Parse(configuration["Minio:UseSSL"]!))
-            .Build());
+          .WithEndpoint(configuration["Minio:Endpoint"])
+          .WithCredentials(configuration["Minio:AccessKey"], configuration["Minio:SecretKey"])
+          .WithSSL(configuration.GetValue<bool>("Minio:UseSSL"))
+          .Build());
 
         //application services registration
         services.AddScoped<IMinioService, MinioService>();

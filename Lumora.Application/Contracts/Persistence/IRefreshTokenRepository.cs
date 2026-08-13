@@ -14,4 +14,6 @@ public interface IRefreshTokenRepository
         CancellationToken cancellationToken = default);
 
     void Add(RefreshToken refreshToken);
+
+    Task<int> RemoveRangeAsync(Expression<Func<RefreshToken, bool>> predicate, CancellationToken cancellationToken = default);
 }
