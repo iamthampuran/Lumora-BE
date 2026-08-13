@@ -2,6 +2,7 @@
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Auth.Commands.CreateConsumer;
 using Lumora.Application.Features.Auth.Commands.CreateStudio;
+using Lumora.Application.Features.Auth.Commands.LogoutUser;
 using Lumora.Application.Features.Auth.Commands.SignInUser;
 using Lumora.Application.Features.Auth.Commands.SignupAccount;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +65,15 @@ namespace Lumora.Api.Controllers
         public async Task<ActionResult<SignInUserResponse>> SignIn([FromBody] SignInUserCommand command, CancellationToken cancellationToken)
         {
             var result = await messageBus.InvokeAsync<Result<SignInUserResponse>> (command, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [HttpDelete("logout/{userId}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(int), (int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<int>> Logout([FromRoute] Guid userId, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<int>>(new LogoutUserCommand(userId), cancellationToken);
             return result.ToActionResult(this);
         }
     }

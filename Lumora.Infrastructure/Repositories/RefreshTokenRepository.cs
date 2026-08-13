@@ -33,4 +33,13 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     {
         _context.RefreshTokens.Add(refreshToken);
     }
+
+    public async Task<int> RemoveRangeAsync(Expression<Func<RefreshToken, bool>> predicate, CancellationToken cancellationToken = default)
+    {
+        var refreshTokens = await _context.RefreshTokens.Where(predicate)
+            .ToListAsync(cancellationToken);
+
+        _context.RefreshTokens.RemoveRange(refreshTokens);
+        return refreshTokens.Count;
+    }
 }
