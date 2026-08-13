@@ -96,7 +96,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
         if (orderBy != null)
         {
-            return await orderBy(query).FirstOrDefaultAsync();
+            return await orderBy(query).FirstOrDefaultAsync(cancellationToken);
         }
 
         if (includes != null)
@@ -104,6 +104,6 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
             query = includes.Aggregate(query, (current, include) => current.Include(include));
         }
 
-        return await query.FirstOrDefaultAsync();
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 }
