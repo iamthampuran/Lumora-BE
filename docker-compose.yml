@@ -51,6 +51,8 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
+      - ./certs/localhost.pem:/root/.minio/certs/public.crt:ro
+      - ./certs/localhost.key:/root/.minio/certs/private.key:ro
     networks:
       - lumina_network
 

@@ -24,7 +24,7 @@ public class SignInUserCommandHandler(IUserRepository userRepository, ILogger<Si
             return Result.Error("Invalid password entered");
         }
 
-        var result = new SignInUserResponse(authService.GenerateAccessTokenAsync(user), authService.GenerateRefreshTokenAsync(user).refreshToken);
+        var result = new SignInUserResponse(await authService.GenerateAccessTokenAsync(user), authService.GenerateRefreshTokenAsync(user).refreshToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

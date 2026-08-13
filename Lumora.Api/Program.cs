@@ -2,6 +2,8 @@ using Lumora.Api.Handlers;
 using Lumora.Application;
 using Lumora.Application.Configuration;
 using Lumora.Infrastructure;
+using Lumora.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,5 +58,11 @@ app.UseAuthorization();
 app.UseExceptionHandler();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 app.Run();
