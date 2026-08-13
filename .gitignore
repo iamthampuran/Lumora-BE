@@ -60,6 +60,12 @@ Thumbs.db
 docker-compose.override.yml
 *.env
 
+# SSL/TLS Certificates
+certs/
+*.pem
+*.key
+*.crt
+
 # AppSettings (Optional: Ignore local dev settings if you don't want them in source control)
 # appsettings.Development.json
 # appsettings.Local.json
