@@ -27,5 +27,6 @@ public class Event : BaseEntity
     public virtual StudioProfile? SelectedStudio { get; set; }
     public virtual ICollection<Inquiry> Inquiries { get; set; } = [];
     public virtual ICollection<Review> Reviews { get; set; } = [];
+    public virtual ICollection<EventTag> EventTags { get; set; } = [];
 
 }

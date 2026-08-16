@@ -18,6 +18,17 @@ public static class TagConfiguration
         entity.HasIndex(e => e.Name)
             .IsUnique();
 
-        entity.HasQueryFilter(e => e.IsActive && e.DeletedAt != null);
+        // Studio-Tag: Many-to-many via implicit junction table
+        entity.HasMany(t => t.Studios)
+            .WithMany(s => s.Tags)
+            .UsingEntity("StudioTags");
+
+        // Event-Tag: One-to-many via explicit EventTag association
+        entity.HasMany(t => t.EventTags)
+            .WithOne(et => et.Tag)
+            .HasForeignKey(et => et.TagId);
+
+        // Soft delete support
+        entity.HasQueryFilter(e => e.IsActive && e.DeletedAt == null);
     }
 }

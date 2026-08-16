@@ -52,6 +52,11 @@ public static class EventConfiguration
             .HasForeignKey(e => e.SelectedStudioId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        entity.HasMany(e => e.EventTags)
+           .WithOne(et => et.Event)
+           .HasForeignKey(et => et.EventId)
+           .OnDelete(DeleteBehavior.Cascade);
+
         entity.HasIndex(e => e.ConsumerId);
         entity.HasIndex(e => e.Status);
 
