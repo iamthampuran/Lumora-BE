@@ -48,8 +48,9 @@ public static class StudioProfileConfiguration
             .OnDelete(DeleteBehavior.Cascade);
 
         entity.HasMany(e => e.Tags)
-            .WithMany(t => t.Studios)
-            .UsingEntity("StudioTags");
+            .WithOne(st => st.Studio)
+            .HasForeignKey(st => st.StudioProfile)
+            .OnDelete(DeleteBehavior.Cascade);
 
         entity.HasIndex(e => e.StudioName);
 

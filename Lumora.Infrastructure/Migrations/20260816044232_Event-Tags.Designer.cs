@@ -3,6 +3,7 @@ using System;
 using Lumora.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Lumora.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260816044232_Event-Tags")]
+    partial class EventTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,6 +68,10 @@ namespace Lumora.Infrastructure.Migrations
                     b.Property<string>("ModifiedBy")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("PhotographyStyle")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<Guid?>("SelectedStudioId")
                         .HasColumnType("uuid");
@@ -898,47 +905,6 @@ namespace Lumora.Infrastructure.Migrations
                     b.ToTable("PortfolioImages");
                 });
 
-            modelBuilder.Entity("Lumora.Domain.Entities.Studio.StudioTag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("StudioProfile")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TagId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudioProfile");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("StudioTag");
-                });
-
             modelBuilder.Entity("Lumora.Domain.Entities.Tag.Tag", b =>
                 {
                     b.Property<Guid>("Id")
@@ -976,6 +942,21 @@ namespace Lumora.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("StudioTags", b =>
+                {
+                    b.Property<Guid>("StudiosId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("StudiosId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("StudioTags");
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Event.Event", b =>
@@ -1340,23 +1321,19 @@ namespace Lumora.Infrastructure.Migrations
                     b.Navigation("StudioProfile");
                 });
 
-            modelBuilder.Entity("Lumora.Domain.Entities.Studio.StudioTag", b =>
+            modelBuilder.Entity("StudioTags", b =>
                 {
-                    b.HasOne("Lumora.Domain.Entities.Identity.StudioProfile", "Studio")
-                        .WithMany("Tags")
-                        .HasForeignKey("StudioProfile")
+                    b.HasOne("Lumora.Domain.Entities.Identity.StudioProfile", null)
+                        .WithMany()
+                        .HasForeignKey("StudiosId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Lumora.Domain.Entities.Tag.Tag", "Tag")
-                        .WithMany("StudioTags")
-                        .HasForeignKey("TagId")
+                    b.HasOne("Lumora.Domain.Entities.Tag.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Studio");
-
-                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Event.Event", b =>
@@ -1402,8 +1379,6 @@ namespace Lumora.Infrastructure.Migrations
                     b.Navigation("PortfolioImages");
 
                     b.Navigation("Reviews");
-
-                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Identity.User", b =>
@@ -1418,8 +1393,6 @@ namespace Lumora.Infrastructure.Migrations
             modelBuilder.Entity("Lumora.Domain.Entities.Tag.Tag", b =>
                 {
                     b.Navigation("EventTags");
-
-                    b.Navigation("StudioTags");
                 });
 #pragma warning restore 612, 618
         }

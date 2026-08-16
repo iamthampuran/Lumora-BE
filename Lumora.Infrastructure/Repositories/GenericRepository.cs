@@ -17,6 +17,11 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         var addedEntity = _appDbContext.Add(entity);
     }
 
+    public void AddRange(IEnumerable<T> entities)
+    {
+        _appDbContext.AddRange(entities);
+    }
+
     public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
         return await _appDbContext.Set<T>().AnyAsync(predicate, cancellationToken);

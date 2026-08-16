@@ -26,9 +26,6 @@ public static class EventConfiguration
         entity.Property(e => e.Duration)
             .IsRequired();
 
-        entity.Property(e => e.PhotographyStyle)
-            .HasMaxLength(200);
-
         entity.Property(e => e.SpecialRequirements)
             .HasMaxLength(500);
 

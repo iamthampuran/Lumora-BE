@@ -1,6 +1,7 @@
 ﻿using Lumora.Domain.Entities.Common;
 using Lumora.Domain.Entities.Event;
 using Lumora.Domain.Entities.Identity;
+using Lumora.Domain.Entities.Studio;
 
 namespace Lumora.Domain.Entities.Tag;
 
@@ -8,7 +9,7 @@ public class Tag : BaseEntity
 {
     public string Name { get; set; }  // Just the name, no TagType
 
-    public virtual ICollection<StudioProfile> Studios { get; set; } = [];
+    public virtual ICollection<StudioTag> StudioTags { get; set; } = [];
     public virtual ICollection<EventTag> EventTags { get; set; } = [];
 
     public Tag(string name)

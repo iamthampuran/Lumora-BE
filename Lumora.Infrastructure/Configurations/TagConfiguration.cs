@@ -18,10 +18,10 @@ public static class TagConfiguration
         entity.HasIndex(e => e.Name)
             .IsUnique();
 
-        // Studio-Tag: Many-to-many via implicit junction table
-        entity.HasMany(t => t.Studios)
-            .WithMany(s => s.Tags)
-            .UsingEntity("StudioTags");
+        // Studio-Tag: One-to-many via explicit StudioTag association
+        entity.HasMany(t => t.StudioTags)
+            .WithOne(st => st.Tag)
+            .HasForeignKey(st => st.TagId);
 
         // Event-Tag: One-to-many via explicit EventTag association
         entity.HasMany(t => t.EventTags)
