@@ -50,6 +50,7 @@ public class AppDbContext : DbContext
         modelBuilder.ConfigureRefreshToken();
         modelBuilder.ConfigureEventType();
         modelBuilder.ConfigureEventTag();
+        modelBuilder.ConfigureStudioTag();
     }
 
 }

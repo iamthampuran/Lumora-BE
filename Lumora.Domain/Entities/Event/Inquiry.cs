@@ -3,6 +3,7 @@ using Lumora.Domain.Entities.Identity;
 using Lumora.Domain.Entities.Payments;
 using Lumora.Domain.Entities.Reviews;
 using Lumora.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Lumora.Domain.Entities.Event;
 
@@ -14,6 +15,9 @@ public class Inquiry : BaseEntity
     public string? Message { get; set; }
     public InquiryStatus Status { get; set; } = InquiryStatus.Submitted;
     public string? RejectionStatus {  get; set; }
+
+    [Range(typeof(decimal), "0", "100000")]
+    public decimal? QuotedAmount { get; set; }
 
     //navigation property
     public virtual Event Event { get; set; } = null!;
