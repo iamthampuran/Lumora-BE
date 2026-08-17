@@ -3,6 +3,7 @@ using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Consumer.Commands.AddProfilePicture;
 using Lumora.Application.Features.Consumer.Commands.CreateEvent;
 using Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
+using Lumora.Application.Features.Consumer.Queries.GetEventById;
 using Lumora.Application.Features.Consumer.Queries.GetInquiryWidget;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Enums;
@@ -56,6 +57,15 @@ public class ConsumerProfileController(IMessageBus messageBus) : ControllerBase
             return BadRequest("Consumer ID in the route does not match the Consumer ID in the request body.");
         }
         var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken);
+        return result.ToActionResult(this);
+    }
+
+    [HttpGet("event/{id}")]
+    [ProducesResponseType(typeof(GetEventByIdQueryResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<GetEventByIdQueryResponse>> GetEventDetailsById([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        var result = await messageBus.InvokeAsync<Result<GetEventByIdQueryResponse>>(new GetEventByIdQuery(id), cancellationToken);
         return result.ToActionResult(this);
     }
 }
