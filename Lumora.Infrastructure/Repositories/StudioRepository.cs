@@ -78,9 +78,9 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                         studio.User.Email),
 
                 Tags = studio.Tags
-                    .Select(t => new TagDetails(
-                        t.Id,
-                        t.Name))
+                    .Select(st => new TagDetails(
+                        st.Tag.Id,
+                        st.Tag.Name))
                     .ToList(),
 
                 PortfolioDetails = studio.PortfolioImages

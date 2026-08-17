@@ -6,6 +6,7 @@ namespace Lumora.Application.Contracts.Persistence;
 public interface IGenericRepository<T> where T : BaseEntity
 {
     void Add(T entity);
+    void AddRange(IEnumerable<T> entities);
     void Delete(T entity);
     void Delete(IEnumerable<T> entities);
     Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);

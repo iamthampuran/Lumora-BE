@@ -26,21 +26,12 @@ public static class EventConfiguration
         entity.Property(e => e.Duration)
             .IsRequired();
 
-        entity.Property(e => e.PhotographyStyle)
-            .HasMaxLength(200);
-
         entity.Property(e => e.SpecialRequirements)
             .HasMaxLength(500);
 
         entity.OwnsOne(e => e.Location, eo =>
         {
             eo.ToJson();
-        });
-
-        entity.OwnsOne(e => e.EventCategory, eo =>
-        {
-            eo.Property(ec => ec.Type).HasColumnName("event_category_type");
-            eo.Property(ec => ec.Value).HasColumnName("event_category_value");
         });
 
         entity.HasOne(e => e.Consumer)
@@ -57,6 +48,11 @@ public static class EventConfiguration
             .WithMany()
             .HasForeignKey(e => e.SelectedStudioId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        entity.HasMany(e => e.EventTags)
+           .WithOne(et => et.Event)
+           .HasForeignKey(et => et.EventId)
+           .OnDelete(DeleteBehavior.Cascade);
 
         entity.HasIndex(e => e.ConsumerId);
         entity.HasIndex(e => e.Status);

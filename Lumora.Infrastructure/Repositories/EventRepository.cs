@@ -29,7 +29,7 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
             .Skip((paginationOptions.PageCount - 1)* paginationOptions.PageSize)
             .Take(paginationOptions.PageSize);
 
-        var result = await newQuery.Select(e => new EventDetails(
+        var result = await newQuery.OrderByDescending(e => e.ModifiedAt).Select(e => new EventDetails(
                 e.Id,
                 e.Title,
                 e.EventDate,

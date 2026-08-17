@@ -3,6 +3,7 @@ using System;
 using Lumora.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Lumora.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260816044232_Event-Tags")]
+    partial class EventTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,6 +68,10 @@ namespace Lumora.Infrastructure.Migrations
                     b.Property<string>("ModifiedBy")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("PhotographyStyle")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<Guid?>("SelectedStudioId")
                         .HasColumnType("uuid");
@@ -898,47 +905,6 @@ namespace Lumora.Infrastructure.Migrations
                     b.ToTable("PortfolioImages");
                 });
 
-            modelBuilder.Entity("Lumora.Domain.Entities.Studio.StudioTag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("StudioProfile")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TagId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudioProfile");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("StudioTag");
-                });
-
             modelBuilder.Entity("Lumora.Domain.Entities.Tag.Tag", b =>
                 {
                     b.Property<Guid>("Id")
@@ -976,108 +942,21 @@ namespace Lumora.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Tags");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("df699af6-7d5e-4c0e-84df-70ba1c2c736b"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "cinematic"
-                        },
-                        new
-                        {
-                            Id = new Guid("accda9f2-4ca7-4102-8cc1-40348ea42a52"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "documentary"
-                        },
-                        new
-                        {
-                            Id = new Guid("f1d92970-e307-4997-9b7a-27527afd2173"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "moody"
-                        },
-                        new
-                        {
-                            Id = new Guid("d4702155-2ae0-445a-9fb3-cf6b04966bba"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "candid"
-                        },
-                        new
-                        {
-                            Id = new Guid("68f3bb15-c4bb-41a8-912c-49563b2386d2"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "traditional"
-                        },
-                        new
-                        {
-                            Id = new Guid("d7bc3b61-4fb9-4802-a83f-f7c5c91c521f"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "editorial"
-                        },
-                        new
-                        {
-                            Id = new Guid("a13145e5-bd2d-4433-b1f4-cd17e4b3d093"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "film"
-                        },
-                        new
-                        {
-                            Id = new Guid("c15e9002-b7eb-48a3-b197-5c7bfb22c806"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "drone"
-                        },
-                        new
-                        {
-                            Id = new Guid("51a4aebc-2cbe-4ce1-b95f-05a88ff163ab"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "corporate"
-                        },
-                        new
-                        {
-                            Id = new Guid("981479f3-3a6a-4b59-ac3e-3199edfd6a93"),
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "system",
-                            IsActive = true,
-                            ModifiedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "system",
-                            Name = "wedding"
-                        });
+            modelBuilder.Entity("StudioTags", b =>
+                {
+                    b.Property<Guid>("StudiosId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("StudiosId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("StudioTags");
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Event.Event", b =>
@@ -1442,23 +1321,19 @@ namespace Lumora.Infrastructure.Migrations
                     b.Navigation("StudioProfile");
                 });
 
-            modelBuilder.Entity("Lumora.Domain.Entities.Studio.StudioTag", b =>
+            modelBuilder.Entity("StudioTags", b =>
                 {
-                    b.HasOne("Lumora.Domain.Entities.Identity.StudioProfile", "Studio")
-                        .WithMany("Tags")
-                        .HasForeignKey("StudioProfile")
+                    b.HasOne("Lumora.Domain.Entities.Identity.StudioProfile", null)
+                        .WithMany()
+                        .HasForeignKey("StudiosId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Lumora.Domain.Entities.Tag.Tag", "Tag")
-                        .WithMany("StudioTags")
-                        .HasForeignKey("TagId")
+                    b.HasOne("Lumora.Domain.Entities.Tag.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Studio");
-
-                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Event.Event", b =>
@@ -1504,8 +1379,6 @@ namespace Lumora.Infrastructure.Migrations
                     b.Navigation("PortfolioImages");
 
                     b.Navigation("Reviews");
-
-                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Lumora.Domain.Entities.Identity.User", b =>
@@ -1520,8 +1393,6 @@ namespace Lumora.Infrastructure.Migrations
             modelBuilder.Entity("Lumora.Domain.Entities.Tag.Tag", b =>
                 {
                     b.Navigation("EventTags");
-
-                    b.Navigation("StudioTags");
                 });
 #pragma warning restore 612, 618
         }

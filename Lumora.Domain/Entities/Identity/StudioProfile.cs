@@ -29,7 +29,7 @@ public class StudioProfile : BaseEntity
     //navigation
     public virtual User User { get; set; } = null!;
     public virtual ICollection<Employee> Employees { get; set; } = [];
-    public virtual ICollection<Tag.Tag> Tags { get; set; } = [];
+    public virtual ICollection<StudioTag> Tags { get; set; } = [];
     public virtual ICollection<Inquiry> Inquiries { get; set; } = [];
     public virtual ICollection<Payment> Payments { get; set; } = [];
     public virtual ICollection<Review> Reviews { get; set; } = [];
