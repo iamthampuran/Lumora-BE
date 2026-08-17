@@ -19,9 +19,9 @@ public class EventTypeRepository : GenericRepository<EventType>, IEventTypeRepos
         var query = _appDbContext.EventTypes.AsQueryable().AsNoTracking();
         if (searchText != null)
         {
-            query = query.Where(x => x.Name.Contains(searchText));
+            query = query.Where(et => et.Name.Contains(searchText));
         }
 
-        return await query.Select(x => new GetEventTypesQueryResponse(x.Id, x.Name)).ToListAsync(cancellationToken);
+        return await query.OrderBy(et => et.CreatedAt).Select(et => new GetEventTypesQueryResponse(et.Id, et.Name)).ToListAsync(cancellationToken);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Common.Queries.GetEventCategories;
+using Lumora.Application.Features.Common.Queries.GetTags;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Wolverine;
@@ -16,6 +17,14 @@ public class LookupController (IMessageBus messageBus) : ControllerBase
     public async Task<ActionResult<IEnumerable<GetEventTypesQueryResponse>>> GetEventTypes([FromQuery] string? searchText, CancellationToken cancellationToken)
     {
         var result = await messageBus.InvokeAsync<Result<IEnumerable<GetEventTypesQueryResponse>>>(new GetEventTypesQuery(searchText), cancellationToken);
+        return result.ToActionResult(this);
+    }
+
+    [ProducesResponseType(typeof(IEnumerable<GetTagsQueryResponse>), (int)HttpStatusCode.OK)]
+    [HttpGet("tags")]
+    public async Task<ActionResult<IEnumerable<GetTagsQueryResponse>>> GetTags([FromQuery] string? searchText, CancellationToken cancellationToken)
+    {
+        var result = await messageBus.InvokeAsync<Result<IEnumerable<GetTagsQueryResponse>>>(new GetTagsQuery(searchText), cancellationToken);
         return result.ToActionResult(this);
     }
 }
