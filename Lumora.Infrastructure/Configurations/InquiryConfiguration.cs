@@ -18,6 +18,9 @@ public static class InquiryConfiguration
         entity.Property(e => e.RejectionStatus)
             .HasMaxLength(1000);
 
+        entity.Property(e => e.QuotedAmount)
+            .HasPrecision(8, 2);
+
         entity.Property(i => i.Status)
             .IsRequired()
             .HasConversion<string>();
@@ -59,6 +62,11 @@ public static class InquiryConfiguration
         entity.HasIndex(i => i.EventId);
         entity.HasIndex(i => i.ConsumerId);
         entity.HasIndex(i => i.Status);
+
+        entity.ToTable(t => t.HasCheckConstraint(
+            "CK_Inquiry_QuotedAmount",
+            "\"QuotedAmount\" >= 0 AND \"QuotedAmount\" <= 100000"
+        ));
 
         entity.HasQueryFilter(i => i.IsActive && i.DeletedAt == null);
     }

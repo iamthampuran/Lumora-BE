@@ -21,7 +21,7 @@ public class MinioService(IMinioClient minioClient, IOptions<AppSettingsConfigur
         return true;
     }
 
-    public async Task<string> GeneratePresignedUrlAsync(string filePath, int expirtationMinutes = 60)
+    public async Task<string> GeneratePresignedUrlAsync(string filePath, int expirtationMinutes = 120)
     {
         var presignedObjectArgs = new PresignedGetObjectArgs()
             .WithBucket(BucketName)

@@ -3,6 +3,7 @@ using System;
 using Lumora.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Lumora.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260817093734_QuotedAmountAdded")]
+    partial class QuotedAmountAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,72 +246,6 @@ namespace Lumora.Infrastructure.Migrations
                             ModifiedAt = new DateTime(2026, 8, 13, 15, 18, 24, 211, DateTimeKind.Utc).AddTicks(562),
                             ModifiedBy = "System",
                             Name = "Pre-Wedding"
-                        },
-                        new
-                        {
-                            Id = new Guid("d6f58d6f-43f5-4be8-9a34-2e45f9a1a101"),
-                            CreatedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "System",
-                            IsActive = true,
-                            IsPredefined = true,
-                            ModifiedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "System",
-                            Name = "Reception"
-                        },
-                        new
-                        {
-                            Id = new Guid("57f0de02-5aa8-43bd-a0f8-04f4f49f2102"),
-                            CreatedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "System",
-                            IsActive = true,
-                            IsPredefined = true,
-                            ModifiedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "System",
-                            Name = "Haldi"
-                        },
-                        new
-                        {
-                            Id = new Guid("f9e17d4f-5f9b-4604-af70-65a3c30c6b03"),
-                            CreatedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "System",
-                            IsActive = true,
-                            IsPredefined = true,
-                            ModifiedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "System",
-                            Name = "Baby Shower"
-                        },
-                        new
-                        {
-                            Id = new Guid("9b4c75db-4fd8-4f64-8d26-7b3ae16bb004"),
-                            CreatedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "System",
-                            IsActive = true,
-                            IsPredefined = true,
-                            ModifiedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "System",
-                            Name = "Maternity Shoot"
-                        },
-                        new
-                        {
-                            Id = new Guid("79c8f6c9-f717-4d2e-9269-b66712a94805"),
-                            CreatedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "System",
-                            IsActive = true,
-                            IsPredefined = true,
-                            ModifiedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "System",
-                            Name = "Housewarming"
-                        },
-                        new
-                        {
-                            Id = new Guid("2d25cce8-8923-4c57-8f83-70de9b04c006"),
-                            CreatedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            CreatedBy = "System",
-                            IsActive = true,
-                            IsPredefined = true,
-                            ModifiedAt = new DateTime(2026, 8, 18, 10, 0, 0, 0, DateTimeKind.Utc),
-                            ModifiedBy = "System",
-                            Name = "Graduation"
                         });
                 });
 

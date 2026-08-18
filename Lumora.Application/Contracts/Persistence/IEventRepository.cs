@@ -1,4 +1,5 @@
 ﻿using Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
+using Lumora.Application.Features.Consumer.Queries.GetEventById;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Entities.Event;
 using Lumora.Domain.Enums;
@@ -8,4 +9,5 @@ namespace Lumora.Application.Contracts.Persistence;
 public interface IEventRepository : IGenericRepository<Event>
 {
     Task<GetDashboardTableQueryResponse> GetConsumerEventsAsync(Guid id, EventStatus status, PaginationOptions paginationOptions, CancellationToken cancellationToken = default);
+    Task<GetEventByIdQueryResponse?> GetEventDetailsAsync(Guid id, CancellationToken cancellationToken, bool disableTracking = true);
 }
