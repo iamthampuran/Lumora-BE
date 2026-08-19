@@ -10,7 +10,11 @@ public class GetDashboardTableQueryHandler(ILogger<GetDashboardTableQueryHandler
     {
         logger.LogInformation("Handling query - {@query}", nameof(GetDashboardTableQuery));
 
-        var response = await eventRepository.GetConsumerEventsAsync(request.Id, request.Status, request.PaginationOptions, cancellationToken);
-        return Result.Success(response);
+        var createdCount = await eventRepository.CountAsync(e => e.Status == Domain.Enums.EventStatus.Created && e.ConsumerId == request.Id);
+        var completedCount = await eventRepository.CountAsync(e => e.Status == Domain.Enums.EventStatus.Complete && e.ConsumerId == request.Id);
+        var activeCount = await eventRepository.CountAsync(e => e.Status != Domain.Enums.EventStatus.Created && e.Status != Domain.Enums.EventStatus.Complete && e.ConsumerId == request.Id);
+
+        var response = await eventRepository.GetConsumerEventsAsync(request.Id, request.Status, request.PaginationOptions, request.SearchText, cancellationToken);
+        return Result.Success(new GetDashboardTableQueryResponse(createdCount, completedCount, activeCount, response));
     }
 }

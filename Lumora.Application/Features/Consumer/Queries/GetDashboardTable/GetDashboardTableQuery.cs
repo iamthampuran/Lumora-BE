@@ -3,4 +3,4 @@ using Lumora.Domain.Enums;
 
 namespace Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
 
-public record GetDashboardTableQuery(Guid Id, EventStatus Status, PaginationOptions PaginationOptions);
+public record GetDashboardTableQuery(Guid Id, EventStatus Status, PaginationOptions PaginationOptions, string? SearchText);

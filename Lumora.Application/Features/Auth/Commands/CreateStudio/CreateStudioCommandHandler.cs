@@ -32,7 +32,7 @@ public class CreateStudioCommandHandler(IUnitOfWork unitOfWork, ILogger<CreateSt
             Description = command.Description,
             Phone = command.PhoneNumber,
             Website = command.Website,
-            Location = new Domain.Entities.Common.ValueObjects.Coordinates(command.Latitude, command.Longitude),
+            Location = new Domain.Entities.Common.ValueObjects.Coordinates(command.Latitude, command.Longitude, string.Empty),
             ServiceRadius = new Domain.Entities.Common.ValueObjects.ServiceRadius()
             {
                 RadiusType = Domain.Enums.RadiusType.Km,

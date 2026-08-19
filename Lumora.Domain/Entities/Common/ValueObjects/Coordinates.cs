@@ -4,8 +4,9 @@ public class Coordinates
 {
     public double Latitude { get; init; }
     public double Longitude { get; init; }
+    public string LocationName { get; init; }
 
-    public Coordinates(double latitude, double longitude)
+    public Coordinates(double latitude, double longitude, string locationName)
     {
         if (latitude < -90 || latitude > 90)
             throw new ArgumentException("Latitude must be between -90 and 90");
@@ -14,6 +15,7 @@ public class Coordinates
 
         Latitude = latitude;
         Longitude = longitude;
+        LocationName = locationName;
     }
 
     public override bool Equals(object? obj) => 
