@@ -21,7 +21,8 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
         _minioService = minioService;
     }
 
-    public async Task<PaginatedResponse<EventDetails>> GetConsumerEventsAsync(Guid id, EventStatus status, PaginationOptions paginationOptions, string? searchText, CancellationToken cancellationToken = default)
+    public async Task<PaginatedResponse<EventDetails>> GetConsumerEventsAsync(Guid id, EventStatus status, PaginationOptions paginationOptions, string? searchText, EventFilterOptions? eventFilterOptions,
+        CancellationToken cancellationToken = default)
     {
         var query = _appDbContext.Events.AsNoTracking().Where(e => e.ConsumerId == id);
 
@@ -32,6 +33,35 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
             var searchPattern = $"%{searchText}%";
             query = query.Where(e => EF.Functions.ILike(e.Title, searchPattern) || EF.Functions.ILike(e.Location.LocationName, searchPattern));
         }
+
+        if (eventFilterOptions != null)
+        {
+            if (eventFilterOptions.StartDate.HasValue)
+            {
+                query = query.Where(e => e.EventDate >= eventFilterOptions.StartDate.Value);
+            }
+
+            if (eventFilterOptions.EndDate.HasValue)
+            {
+                query = query.Where(e => e.EventDate <= eventFilterOptions.EndDate.Value);
+            }
+
+            if (eventFilterOptions.EventTypeIds != null  && eventFilterOptions.EventTypeIds.Any())
+            {
+                query = query.Where(e => eventFilterOptions.EventTypeIds.Contains(e.EventTypeId));
+            }
+
+            if (eventFilterOptions.MinPrice.HasValue)
+            {
+                query = query.Where(e => e.Budget >= eventFilterOptions.MinPrice.Value);
+            }
+
+            if (eventFilterOptions.MaxPrice.HasValue)
+            {
+                query = query.Where(e => e.Budget <= eventFilterOptions.MaxPrice.Value);
+            }
+        }
+
 
         var finalQuery = query
             .OrderByDescending(e => e.ModifiedAt)

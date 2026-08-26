@@ -14,12 +14,17 @@ public class EventTypeRepository : GenericRepository<EventType>, IEventTypeRepos
         _appDbContext = appDbContext;
     }
 
-    public async Task<IEnumerable<GetEventTypesQueryResponse>> GetEventTypes(string? searchText, CancellationToken cancellationToken)
+    public async Task<IEnumerable<GetEventTypesQueryResponse>> GetEventTypes(string? searchText, bool includeOnlyPredefined = true, CancellationToken cancellationToken = default)
     {
         var query = _appDbContext.EventTypes.AsQueryable().AsNoTracking();
         if (searchText != null)
         {
             query = query.Where(et => et.Name.Contains(searchText));
+        }
+
+        if (includeOnlyPredefined)
+        {
+            query = query.Where(et => et.IsPredefined);
         }
 
         return await query.OrderBy(et => et.CreatedAt).Select(et => new GetEventTypesQueryResponse(et.Id, et.Name)).ToListAsync(cancellationToken);

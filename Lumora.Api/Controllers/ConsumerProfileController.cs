@@ -30,10 +30,10 @@ public class ConsumerProfileController(IMessageBus messageBus) : ControllerBase
     [HttpGet("{id}/dashboard/events")]
     [ProducesResponseType(typeof(GetDashboardTableQueryResponse), (int)HttpStatusCode.OK)]
     public async Task<ActionResult<GetDashboardTableQueryResponse>> GetConsumerDashboard([FromRoute] Guid id, [FromQuery] EventStatus eventStatus,
-        [FromQuery] PaginationOptions? paginationOptions, [FromQuery] string? searchText,
+        [FromQuery] PaginationOptions? paginationOptions, [FromQuery] string? searchText, [FromQuery] EventFilterOptions? eventFilterOptions,
         CancellationToken cancellationToken)
     {
-        var query = new GetDashboardTableQuery(id, eventStatus, paginationOptions ?? new PaginationOptions(), searchText);
+        var query = new GetDashboardTableQuery(id, eventStatus, paginationOptions ?? new PaginationOptions(), searchText, eventFilterOptions);
         var result = await messageBus.InvokeAsync<Result<GetDashboardTableQueryResponse>>(query, cancellationToken);
         return result.ToActionResult(this);
     }
@@ -68,7 +68,5 @@ public class ConsumerProfileController(IMessageBus messageBus) : ControllerBase
         var result = await messageBus.InvokeAsync<Result<GetEventByIdQueryResponse>>(new GetEventByIdQuery(id), cancellationToken);
         return result.ToActionResult(this);
     }
-
-    //[HttpGet("events/{id}")]
     
 }

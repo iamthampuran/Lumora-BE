@@ -14,7 +14,7 @@ public class GetDashboardTableQueryHandler(ILogger<GetDashboardTableQueryHandler
         var completedCount = await eventRepository.CountAsync(e => e.Status == Domain.Enums.EventStatus.Complete && e.ConsumerId == request.Id);
         var activeCount = await eventRepository.CountAsync(e => e.Status != Domain.Enums.EventStatus.Created && e.Status != Domain.Enums.EventStatus.Complete && e.ConsumerId == request.Id);
 
-        var response = await eventRepository.GetConsumerEventsAsync(request.Id, request.Status, request.PaginationOptions, request.SearchText, cancellationToken);
+        var response = await eventRepository.GetConsumerEventsAsync(request.Id, request.Status, request.PaginationOptions, request.SearchText, request.EventFilterOptions, cancellationToken);
         return Result.Success(new GetDashboardTableQueryResponse(createdCount, completedCount, activeCount, response));
     }
 }
