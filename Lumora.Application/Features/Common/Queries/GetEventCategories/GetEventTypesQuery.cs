@@ -1,3 +1,3 @@
 ﻿namespace Lumora.Application.Features.Common.Queries.GetEventCategories;
 
-public record GetEventTypesQuery(string? SearchText);
+public record GetEventTypesQuery(string? SearchText, bool includeOnlyPredefined = true);

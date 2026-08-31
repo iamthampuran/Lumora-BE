@@ -8,6 +8,6 @@ namespace Lumora.Application.Contracts.Persistence;
 
 public interface IEventRepository : IGenericRepository<Event>
 {
-    Task<GetDashboardTableQueryResponse> GetConsumerEventsAsync(Guid id, EventStatus status, PaginationOptions paginationOptions, CancellationToken cancellationToken = default);
+    Task<PaginatedResponse<EventDetails>> GetConsumerEventsAsync(Guid id, EventStatus status, PaginationOptions paginationOptions, string? searchText, EventFilterOptions? eventFilterOptions, CancellationToken cancellationToken = default);
     Task<GetEventByIdQueryResponse?> GetEventDetailsAsync(Guid id, CancellationToken cancellationToken, bool disableTracking = true);
 }

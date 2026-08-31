@@ -14,9 +14,9 @@ public class LookupController (IMessageBus messageBus) : ControllerBase
 {
     [ProducesResponseType(typeof(IEnumerable<GetEventTypesQueryResponse>), (int)HttpStatusCode.OK)]
     [HttpGet("event-types")]
-    public async Task<ActionResult<IEnumerable<GetEventTypesQueryResponse>>> GetEventTypes([FromQuery] string? searchText, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<GetEventTypesQueryResponse>>> GetEventTypes([FromQuery] string? searchText, CancellationToken cancellationToken, [FromQuery] bool includeOnlyPredefined = true)
     {
-        var result = await messageBus.InvokeAsync<Result<IEnumerable<GetEventTypesQueryResponse>>>(new GetEventTypesQuery(searchText), cancellationToken);
+        var result = await messageBus.InvokeAsync<Result<IEnumerable<GetEventTypesQueryResponse>>>(new GetEventTypesQuery(searchText, includeOnlyPredefined), cancellationToken);
         return result.ToActionResult(this);
     }
 

@@ -6,6 +6,7 @@ using Lumora.Application.Helpers;
 using Lumora.Domain.Entities.Event;
 using Lumora.Domain.Enums;
 using Lumora.Infrastructure.Data;
+using Lumora.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Lumora.Infrastructure.Repositories;
@@ -20,30 +21,63 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
         _minioService = minioService;
     }
 
-    public async Task<GetDashboardTableQueryResponse> GetConsumerEventsAsync(Guid id, EventStatus status, PaginationOptions paginationOptions, CancellationToken cancellationToken = default)
+    public async Task<PaginatedResponse<EventDetails>> GetConsumerEventsAsync(Guid id, EventStatus status, PaginationOptions paginationOptions, string? searchText, EventFilterOptions? eventFilterOptions,
+        CancellationToken cancellationToken = default)
     {
         var query = _appDbContext.Events.AsNoTracking().Where(e => e.ConsumerId == id);
 
-        var createdEventsCount = await query.CountAsync(e => e.Status == EventStatus.Created, cancellationToken);
-        var completedEventsCount = await query.CountAsync(e => e.Status == EventStatus.Complete, cancellationToken);
-        var activeEventsCount = await query.CountAsync(e => e.Status != EventStatus.Created  && e.Status != EventStatus.Complete, cancellationToken);
+        query = query.Where(e => status == EventStatus.InProgress ? (e.Status != EventStatus.Created && e.Status != EventStatus.Complete) : (e.Status == status));
+
+        if (!string.IsNullOrWhiteSpace(searchText))
+        {
+            var searchPattern = $"%{searchText}%";
+            query = query.Where(e => EF.Functions.ILike(e.Title, searchPattern) || EF.Functions.ILike(e.Location.LocationName, searchPattern));
+        }
+
+        if (eventFilterOptions != null)
+        {
+            if (eventFilterOptions.StartDate.HasValue)
+            {
+                query = query.Where(e => e.EventDate >= eventFilterOptions.StartDate.Value);
+            }
+
+            if (eventFilterOptions.EndDate.HasValue)
+            {
+                query = query.Where(e => e.EventDate <= eventFilterOptions.EndDate.Value);
+            }
+
+            if (eventFilterOptions.EventTypeIds != null  && eventFilterOptions.EventTypeIds.Any())
+            {
+                query = query.Where(e => eventFilterOptions.EventTypeIds.Contains(e.EventTypeId));
+            }
+
+            if (eventFilterOptions.MinPrice.HasValue)
+            {
+                query = query.Where(e => e.Budget >= eventFilterOptions.MinPrice.Value);
+            }
+
+            if (eventFilterOptions.MaxPrice.HasValue)
+            {
+                query = query.Where(e => e.Budget <= eventFilterOptions.MaxPrice.Value);
+            }
+        }
 
 
-        var newQuery = query.Where(e => status == EventStatus.InProgress ? (e.Status != EventStatus.Created && e.Status != EventStatus.Complete) : (e.Status == status))
-            .Skip((paginationOptions.PageCount - 1)* paginationOptions.PageSize)
-            .Take(paginationOptions.PageSize);
-
-        var result = await newQuery.OrderByDescending(e => e.ModifiedAt).Select(e => new EventDetails(
+        var finalQuery = query
+            .OrderByDescending(e => e.ModifiedAt)
+            .Select(e => new EventDetails(
                 e.Id,
                 e.Title,
                 e.EventDate,
-                e.Location,
+                e.Location.LocationName,
                 e.Duration,
-                e.ModifiedAt
-            )).ToListAsync(cancellationToken);
+                e.ModifiedAt,
+                e.EventType.Name,
+                e.EventType.IsPredefined,
+                e.Budget
+                ));
 
-
-        return new GetDashboardTableQueryResponse(createdEventsCount, completedEventsCount, activeEventsCount, result);
+        return await finalQuery.ToPaginatedResponseAsync(paginationOptions.PageCount, paginationOptions.PageSize, cancellationToken);
 
     }
 
