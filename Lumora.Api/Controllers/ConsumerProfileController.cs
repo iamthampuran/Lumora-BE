@@ -2,6 +2,7 @@
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Consumer.Commands.AddProfilePicture;
 using Lumora.Application.Features.Consumer.Commands.CreateEvent;
+using Lumora.Application.Features.Consumer.Queries.FindStudios;
 using Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
 using Lumora.Application.Features.Consumer.Queries.GetEventById;
 using Lumora.Application.Features.Consumer.Queries.GetInquiryWidget;
@@ -66,6 +67,17 @@ public class ConsumerProfileController(IMessageBus messageBus) : ControllerBase
     public async Task<ActionResult<GetEventByIdQueryResponse>> GetEventDetailsById([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var result = await messageBus.InvokeAsync<Result<GetEventByIdQueryResponse>>(new GetEventByIdQuery(id), cancellationToken);
+        return result.ToActionResult(this);
+    }
+
+    [HttpGet("event/{id}/get-studios")]
+    [ProducesResponseType(typeof(PaginatedResponse<FindStudiosQueryResponse>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<PaginatedResponse<FindStudiosQueryResponse>>> GetStudioRecommendationsForEvent([FromRoute] Guid id, [FromQuery] StudioFilterOptions? studioFilterOptions, 
+        [FromQuery] StudioSortOption studioSortOption, [FromQuery] PaginationOptions? paginationOptions)
+    {
+        var result = await messageBus.InvokeAsync<Result<PaginatedResponse<FindStudiosQueryResponse>>>(new FindStudiosQuery(id, studioFilterOptions, paginationOptions ?? new PaginationOptions(),
+            studioSortOption));
         return result.ToActionResult(this);
     }
     
