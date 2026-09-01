@@ -1,7 +1,13 @@
 ﻿using Lumora.Application.Contracts.Persistence;
+using Lumora.Application.Contracts.Services;
+using Lumora.Application.Features.Consumer.Queries.FindStudios;
 using Lumora.Application.Features.Studio.Queries.GetStudioById;
+using Lumora.Application.Helpers;
+using Lumora.Domain.Entities.Event;
 using Lumora.Domain.Entities.Identity;
+using Lumora.Domain.Enums;
 using Lumora.Infrastructure.Data;
+using Lumora.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Lumora.Infrastructure.Repositories;
@@ -9,10 +15,88 @@ namespace Lumora.Infrastructure.Repositories;
 public class StudioRepository : GenericRepository<StudioProfile>, IStudioRepository
 {
     protected new readonly AppDbContext _appDbContext;
+    private readonly IMinioService _minioService;
 
-    public StudioRepository(AppDbContext appDbContext) : base(appDbContext)
+    public StudioRepository(AppDbContext appDbContext, IMinioService minioService) : base(appDbContext)
     {
-        _appDbContext = appDbContext ?? throw new ArgumentNullException(nameof(appDbContext)); 
+        _appDbContext = appDbContext ?? throw new ArgumentNullException(nameof(appDbContext));
+        _minioService = minioService ?? throw new ArgumentNullException(nameof(minioService));
+    }
+
+    public async Task<PaginatedResponse<FindStudiosQueryResponse>> GetRecommendedStudiosAsync(Event eventData, StudioFilterOptions? filterOptions, StudioSortOption sortOption, PaginationOptions paginationOptions, CancellationToken cancellationToken)
+    {
+        IQueryable<StudioProfile> query = _appDbContext.StudioProfiles.AsNoTracking().Include(s => s.Tags);
+
+        if (filterOptions != null)
+        {
+            if (filterOptions.MaxDistance != null)
+            {
+                query.Where(s => CoordinateHelper.CalculateDistance(s.Location, eventData.Location) <= s.ServiceRadius.Distance);
+            }
+
+            if (filterOptions.MinRatings != null)
+            {
+                query.Where(s => s.AverageRating >= filterOptions.MinRatings);
+            }
+        }
+
+        var eventTagIds = eventData.EventTags.Select(s => s.Id).ToList();
+
+        if (eventTagIds.Count > 0)
+        {
+            query = query.Where(s => s.Tags.Any(st => eventTagIds.Contains(st.TagId)));
+        }
+
+        var sortedQuery = sortOption switch
+        {
+            StudioSortOption.Recommended => query.OrderByDescending(s => s.Tags.Count(st => eventTagIds.Contains(st.TagId)))
+            .ThenByDescending(s => s.AverageRating),
+
+            StudioSortOption.Nearest => query.OrderBy(s => CoordinateHelper.CalculateDistance(s.Location, eventData.Location)),
+
+            StudioSortOption.HighestRating => query.OrderByDescending(s => s.AverageRating),
+
+            StudioSortOption.NameDescending => query.OrderByDescending(s => s.StudioName),
+
+            StudioSortOption.NameAscending => query.OrderBy(s => s.StudioName),
+
+            StudioSortOption.PriceHighToLow => query.OrderByDescending(s => s.MinPrice),
+
+            StudioSortOption.PriceLowToHigh => query.OrderBy(s => s.MinPrice),
+
+            _ => query.OrderByDescending(s => s.AverageRating)
+        };
+
+        var finalQuery = sortedQuery.Select(s => new
+        {
+            s.Id,
+            s.Location,
+            AverageRating = s.AverageRating ?? 0,
+            s.ReviewCount,
+            TagNames = s.Tags.Select(t => t.Tag.Name).ToList(),
+            s.CoverImageUrl,
+            s.StartingPrice
+        });
+
+        var pageResult = await finalQuery.ToPaginatedResponseAsync(paginationOptions.PageCount, paginationOptions.PageSize, cancellationToken);
+
+        var finalMappedData = await Task.WhenAll(pageResult.Data.Select(async s =>
+        {
+            var coverUrl = s.CoverImageUrl != null ? await _minioService.GeneratePresignedUrlAsync(s.CoverImageUrl) : null;
+            var distance = (decimal)CoordinateHelper.CalculateDistance(s.Location, eventData.Location);
+
+            return new FindStudiosQueryResponse(
+                s.Id,
+                distance,
+                s.AverageRating,
+                s.ReviewCount,
+                s.TagNames,
+                coverUrl,
+                s.StartingPrice
+                );
+        }));
+
+        return new PaginatedResponse<FindStudiosQueryResponse>(finalMappedData, pageResult.TotalPages, pageResult.PageCount, pageResult.PageSize);
     }
 
     //public async Task<GetStudioByIdResponse?> GetStudioDetailsByIdAsync(Guid id)
