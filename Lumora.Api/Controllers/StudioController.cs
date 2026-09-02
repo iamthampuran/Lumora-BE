@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
+using Lumora.Application.Features.Studio.Commands.UpdateCover;
 using Lumora.Application.Features.Studio.Commands.UpdateLogo;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioById;
@@ -22,7 +23,7 @@ namespace Lumora.Api.Controllers
             return result.ToActionResult(this);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}/update-logo")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<ActionResult<string>> UpdateStudioLogo([FromRoute] Guid id, IFormFile formFile, CancellationToken cancellationToken)
@@ -38,6 +39,16 @@ namespace Lumora.Api.Controllers
         public async Task<ActionResult<ProfileCompletionResult>> GetProfileCompletionDetails([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var result = await messageBus.InvokeAsync<Result<ProfileCompletionResult>>(new GetProfileStatusQuery(id), cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [HttpPatch("{id}/update-cover")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<string>> UpdateCover([FromRoute] Guid id, IFormFile formFile, CancellationToken cancellationToken)
+        {
+            var command = new UpdateCoverCommand(formFile.OpenReadStream(), id, formFile.ContentType);
+            var result = await messageBus.InvokeAsync<Result<string>>(command, cancellationToken);
             return result.ToActionResult(this);
         }
     }
