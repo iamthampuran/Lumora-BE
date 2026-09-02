@@ -15,6 +15,10 @@ public class UpdateCoverCommandValidator : AbstractValidator<UpdateCoverCommand>
             .NotEmpty()
             .WithMessage("File cannot be empty");
 
+        RuleFor(x => x.File.Length)
+            .LessThanOrEqualTo(5 * 1024 * 1024)
+            .WithMessage("Max file size is 2MB");
+
         RuleFor(x => x.ContentType)
             .NotEmpty()
             .WithMessage("Cannot find the content type");
