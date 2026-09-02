@@ -1,7 +1,9 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Studio.Commands.UpdateLogo;
+using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioById;
+using Lumora.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Wolverine;
@@ -27,6 +29,15 @@ namespace Lumora.Api.Controllers
         {
             var command = new UpdateLogoCommand(formFile.OpenReadStream(), id, formFile.ContentType);
             var result = await messageBus.InvokeAsync<Result<string>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [HttpGet("{id}/profile-completion")]
+        [ProducesResponseType(typeof(ProfileCompletionResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ProfileCompletionResult>> GetProfileCompletionDetails([FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<ProfileCompletionResult>>(new GetProfileStatusQuery(id), cancellationToken);
             return result.ToActionResult(this);
         }
     }

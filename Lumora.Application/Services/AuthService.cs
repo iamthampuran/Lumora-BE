@@ -11,6 +11,7 @@ using System.Security.Claims;
 using Lumora.Domain.Enums;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 
 namespace Lumora.Application.Services;
@@ -39,8 +40,17 @@ public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTok
             {
                 var presignedUrl = await minioService.GeneratePresignedUrlAsync(user.StudioProfile.LogoUrl, 180);
                 claims.Add(new Claim("logoUrl", presignedUrl));
-
             }
+            var isProfileComplete =
+                    !string.IsNullOrWhiteSpace(user.StudioProfile.LogoUrl) &&
+                    !string.IsNullOrWhiteSpace(user.StudioProfile.CoverImageUrl) &&
+                    user.StudioProfile.Location is not null &&
+                    user.StudioProfile.ServiceRadius is not null;
+
+            claims.Add(new Claim(
+                "isProfileComplete",
+                isProfileComplete.ToString().ToLowerInvariant(),
+                ClaimValueTypes.Boolean));
         }
         else if (user.Role == UserRole.Consumer && user.ConsumerProfile != null)
         {
