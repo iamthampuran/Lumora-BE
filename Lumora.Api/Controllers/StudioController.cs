@@ -1,7 +1,10 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
+using Lumora.Application.Features.Studio.Commands;
+using Lumora.Application.Features.Studio.Commands.AddPortfolioImage;
 using Lumora.Application.Features.Studio.Commands.UpdateCover;
 using Lumora.Application.Features.Studio.Commands.UpdateLogo;
+using Lumora.Application.Features.Studio.Commands.UpdatePortfolioImage;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioById;
 using Lumora.Domain.Entities.Identity;
@@ -49,6 +52,25 @@ namespace Lumora.Api.Controllers
         {
             var command = new UpdateCoverCommand(formFile.OpenReadStream(), id, formFile.ContentType);
             var result = await messageBus.InvokeAsync<Result<string>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [HttpPost("{id}/add-portfolio-images")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<Guid>> AddPortfolioImages([FromRoute] Guid id, IFormFile file, [FromForm] string? title, [FromForm]int order, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<Guid>>(new AddPortfolioImageCommand(id, file.OpenReadStream(), order, title, file.ContentType), cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [HttpPut("update-portfolio-image/{id}")]
+        [ProducesResponseType(typeof (Guid), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<Guid>> UpdatePortfolioImage([FromRoute] Guid id, IFormFile? file, [FromForm] string? title, [FromForm] int? order, 
+            CancellationToken cancellationToken, [FromForm] bool isDeleted = false)
+        {
+            var result = await messageBus.InvokeAsync<Result<Guid>>(new UpdatePortfolioImageCommand(title, file?.OpenReadStream(), file?.ContentType, order, id, isDeleted), cancellationToken);
             return result.ToActionResult(this);
         }
     }

@@ -18,5 +18,5 @@ public record PricingDetails(decimal minPrice, decimal maxPrice);
 public record GeneralInformation(LocationDetails locationDetails, string phone, string email);
 public record LocationDetails(string city, double latitude, double longitude, string serviceRadiusType, double? distance);
 public record TagDetails(Guid id, string name);
-public record PortfolioDetails(Guid id, string imageUrl, string title, int displayOrder);
+public record PortfolioDetails(Guid id, string imageUrl, string? title, int displayOrder); 
 public record ReviewDetails(Guid id, string reviewerName, decimal rating, string? comment, DateTime date);

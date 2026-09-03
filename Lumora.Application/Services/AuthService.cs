@@ -45,7 +45,12 @@ public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTok
                     !string.IsNullOrWhiteSpace(user.StudioProfile.LogoUrl) &&
                     !string.IsNullOrWhiteSpace(user.StudioProfile.CoverImageUrl) &&
                     user.StudioProfile.Location is not null &&
-                    user.StudioProfile.ServiceRadius is not null;
+                    user.StudioProfile.ServiceRadius is not null &&
+                    user.StudioProfile.CoverImageUrl is not null &&
+                    user.StudioProfile.LogoUrl is not null &&
+                    user.StudioProfile.Employees.Count > 0 &&
+                    user.StudioProfile.Tags.Count > 0 &&
+                    user.StudioProfile.PortfolioImages.Count > 0;
 
             claims.Add(new Claim(
                 "isProfileComplete",

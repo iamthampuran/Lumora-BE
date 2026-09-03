@@ -10,7 +10,7 @@ public class GetProfileStatusQueryHandler(ILogger<GetProfileStatusQueryHandler> 
     public async Task<Result<ProfileCompletionResult>> Handle(GetProfileStatusQuery query, CancellationToken cancellationToken)
     {
         logger.LogInformation("Handling query - {@query}", nameof(GetProfileStatusQuery));
-        var studio = await studioRepository.GetFirstAsync(s => s.Id == query.StudioId, null, [s => s.Employees, s => s.Tags], true, cancellationToken);
+        var studio = await studioRepository.GetFirstAsync(s => s.Id == query.StudioId, null, [s => s.Employees, s => s.Tags, s => s.PortfolioImages], true, cancellationToken);
         if (studio == null)
         {
             return Result.NotFound("Studio details not found in db :(");

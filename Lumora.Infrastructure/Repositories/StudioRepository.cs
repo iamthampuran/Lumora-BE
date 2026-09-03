@@ -128,63 +128,93 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
 
     public async Task<GetStudioByIdResponse?> GetStudioDetailsByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _appDbContext.StudioProfiles
+        var studio = await _appDbContext.StudioProfiles
             .AsNoTracking()
             .Where(p => p.Id == id)
-            .Select(studio => new GetStudioByIdResponse
+            .Select(studio => new
             {
-                Identity = new(
-                    studio.Id,
-                    studio.StudioName,
-                    studio.Description,
-                    studio.LogoUrl,
-                    studio.CoverImageUrl),
-
-                RatingStats = new(
-                    studio.Reviews.Average(r => r.Rating),
-                    studio.Reviews.Count(),
-                    studio.Employees.Count(),
-                    studio.Inquiries.Count(i =>
-                        i.Event.Status == Domain.Enums.EventStatus.Complete)),
-
-                PricingDetails = new(
-                    studio.MinPrice,
-                    studio.MaxPrice),
-
-                GeneralInformation = new(
-                    new LocationDetails(
-                        studio.Location.ToString(),
-                        studio.Location.Latitude,
-                        studio.Location.Longitude,
-                        studio.ServiceRadius.RadiusType.ToString(),
-                        studio.ServiceRadius.Distance),
-                        studio.Phone,
-                        studio.User.Email),
-
-                Tags = studio.Tags
-                    .Select(st => new TagDetails(
-                        st.Tag.Id,
-                        st.Tag.Name))
+                studio.Id,
+                studio.StudioName,
+                studio.Description,
+                studio.LogoUrl,
+                studio.CoverImageUrl,
+                AverageRating = studio.Reviews.Select(r => (decimal?)r.Rating).Average() ?? 0m,
+                ReviewCount = studio.Reviews.Count(),
+                EmployeeCount = studio.Employees.Count(),
+                CompletedInquiryCount = studio.Inquiries.Count(i => i.Event.Status == Domain.Enums.EventStatus.Complete),
+                studio.MinPrice,
+                studio.MaxPrice,
+                LocationText = studio.Location.ToString(),
+                studio.Location.Latitude,
+                studio.Location.Longitude,
+                RadiusType = studio.ServiceRadius.RadiusType.ToString(),
+                studio.ServiceRadius.Distance,
+                studio.Phone,
+                Email = studio.User.Email,
+                Tags = studio.Tags.Select(st => new { st.Tag.Id, st.Tag.Name }).ToList(),
+                PortfolioImages = studio.PortfolioImages
+                    .Select(pi => new { pi.Id, pi.ImageUrl, pi.Title, pi.DisplayOrder })
                     .ToList(),
-
-                PortfolioDetails = studio.PortfolioImages
-                    .Select(pi => new PortfolioDetails(
-                        pi.Id,
-                        pi.ImageUrl,
-                        pi.Title,
-                        pi.DisplayOrder))
-                    .ToList(),
-
                 Reviews = studio.Reviews
                     .OrderByDescending(r => r.ModifiedAt)
-                    .Select(r => new ReviewDetails(
-                        r.Id,
-                        r.Consumer.FullName,
-                        r.Rating,
-                        r.Comment,
-                        r.ModifiedAt))
+                    .Select(r => new { r.Id, ConsumerName = r.Consumer.FullName, r.Rating, r.Comment, r.ModifiedAt })
                     .ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);
+
+        if (studio == null)
+        {
+            return null;
+        }
+
+        var logoUrl = await _minioService.GeneratePresignedUrlAsync(studio.LogoUrl);
+        var coverUrl = await _minioService.GeneratePresignedUrlAsync(studio.CoverImageUrl);
+
+        var portfolioDetails = await Task.WhenAll(studio.PortfolioImages.Select(async pi =>
+            new PortfolioDetails(
+                pi.Id,
+                await _minioService.GeneratePresignedUrlAsync(pi.ImageUrl),
+                pi.Title,
+                pi.DisplayOrder)));
+
+        return new GetStudioByIdResponse
+        {
+            Identity = new(
+                studio.Id,
+                studio.StudioName,
+                studio.Description,
+                logoUrl,
+                coverUrl),
+
+            RatingStats = new(
+                studio.AverageRating,
+                studio.ReviewCount,
+                studio.EmployeeCount,
+                studio.CompletedInquiryCount),
+
+            PricingDetails = new(
+                studio.MinPrice,
+                studio.MaxPrice),
+
+            GeneralInformation = new(
+                new LocationDetails(
+                    studio.LocationText,
+                    studio.Latitude,
+                    studio.Longitude,
+                    studio.RadiusType,
+                    studio.Distance),
+                studio.Phone,
+                studio.Email),
+
+            Tags = studio.Tags
+                .Select(t => new TagDetails(t.Id, t.Name))
+                .ToList(),
+
+            PortfolioDetails = portfolioDetails.ToList(),
+
+            Reviews = studio.Reviews
+                .Select(r => new ReviewDetails(r.Id, r.ConsumerName, r.Rating, r.Comment, r.ModifiedAt))
+                .ToList()
+        };
     }
 }
