@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Folder Include="Entities\Event\ValueObjects\" />
+    <Folder Include="Entities\Studio\ValueObjects\" />
     <Folder Include="ReferenceFiles\" />
   </ItemGroup>
 
