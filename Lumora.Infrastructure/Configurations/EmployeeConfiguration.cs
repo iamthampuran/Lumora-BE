@@ -24,11 +24,9 @@ public static class EmployeeConfiguration
             .IsRequired()
             .HasMaxLength(20);
 
-        entity.OwnsOne(e => e.EmployeeRole, ero =>
-        {
-            ero.Property(er => er.Type).HasColumnName("Employee Role Type");
-            ero.Property(er => er.Value).HasColumnName("Employee Role Value");
-        });
+        entity.Property(e => e.EmployeeRole)
+            .IsRequired()
+            .HasMaxLength(100);
 
         entity.HasOne(e => e.Studio)
             .WithMany(s => s.Employees)
