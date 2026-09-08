@@ -21,6 +21,12 @@ public class AddTagsToStudioComandHandler(ILogger<AddTagsToStudioComandHandler> 
 
         List<Guid> tagList = [.. command.TagIds];
 
+        var invalidTagIdPassed = await tagRepository.AnyAsync(t => !command.TagIds.Contains(t.Id), cancellationToken);
+        if (invalidTagIdPassed)
+        {
+            return Result.Error("1 or more tags selected does not exists");
+        }
+
         if (command.CustomTagDetails != null)
         {
             foreach (var customTag in command.CustomTagDetails)
