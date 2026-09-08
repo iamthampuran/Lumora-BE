@@ -36,6 +36,6 @@ public static class EmployeeConfiguration
         entity.HasIndex(e => e.Email);
         entity.HasIndex(e => new { e.Email, e.Phone }).IsUnique();
 
-        entity.HasQueryFilter(e => e.IsActive && e.DeletedAt != null);
+        entity.HasQueryFilter(e => e.IsActive && e.DeletedAt == null);
     }
 }
