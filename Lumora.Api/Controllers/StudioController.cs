@@ -9,6 +9,7 @@ using Lumora.Application.Features.Studio.Commands.UpdateLogo;
 using Lumora.Application.Features.Studio.Commands.UpdatePortfolioImage;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioById;
+using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
 using Lumora.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -101,6 +102,15 @@ namespace Lumora.Api.Controllers
                 return BadRequest("Id in the url doesn't match the id in the body");
             }
             var result = await messageBus.InvokeAsync<Result<List<Guid>>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [HttpGet("{id}/dashboard")]
+        [ProducesResponseType(typeof(GetStudioDetailsByIdResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<GetStudioDetailsByIdResponse>> GetStudioDashboard([FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<GetStudioDetailsByIdResponse>>(new GetStudioDetailsByIdQuery(id), cancellationToken);
             return result.ToActionResult(this);
         }
     }

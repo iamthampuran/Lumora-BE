@@ -28,6 +28,9 @@ public static class GalleryConfiguration
             .HasDefaultValue(GalleryStatus.Draft)
             .HasConversion<string>();
 
+        entity.Property(g => g.GalleryCover)
+            .IsRequired();
+
         entity.Property(g => g.FolderLink)
             .IsRequired();
 

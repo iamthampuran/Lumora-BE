@@ -2,6 +2,7 @@
 using Lumora.Application.Contracts.Services;
 using Lumora.Application.Features.Consumer.Queries.FindStudios;
 using Lumora.Application.Features.Studio.Queries.GetStudioById;
+using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Entities.Event;
 using Lumora.Domain.Entities.Identity;
@@ -212,9 +213,154 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
 
             PortfolioDetails = portfolioDetails.ToList(),
 
-            Reviews = studio.Reviews
+            Reviews = studio.Reviews.OrderByDescending(r => r.ModifiedAt).Take(5)
                 .Select(r => new ReviewDetails(r.Id, r.ConsumerName, r.Rating, r.Comment, r.ModifiedAt))
                 .ToList()
         };
+    }
+
+    public async Task<GetStudioDetailsByIdResponse?> GetStudioDashboardByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var exists = await _appDbContext.StudioProfiles
+            .AsNoTracking()
+            .AnyAsync(s => s.Id == id, cancellationToken);
+
+        if (!exists)
+        {
+            return null;
+        }
+
+        var utcNow = DateTime.UtcNow;
+        var currentMonthStart = new DateTime(utcNow.Year, utcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var nextMonthStart = currentMonthStart.AddMonths(1);
+        var previousMonthStart = currentMonthStart.AddMonths(-1);
+
+        var currentMonthInquiriesCount = await _appDbContext.Inquiries
+            .AsNoTracking()
+            .CountAsync(i =>
+                i.StudioId == id &&
+                i.CreatedAt >= currentMonthStart &&
+                i.CreatedAt < nextMonthStart,
+                cancellationToken);
+
+        var previousMonthInquiriesCount = await _appDbContext.Inquiries
+            .AsNoTracking()
+            .CountAsync(i =>
+                i.StudioId == id &&
+                i.CreatedAt >= previousMonthStart &&
+                i.CreatedAt < currentMonthStart,
+                cancellationToken);
+
+        var percentageIncrease = previousMonthInquiriesCount == 0
+            ? (currentMonthInquiriesCount > 0 ? 100m : 0m)
+            : Math.Round(
+                ((currentMonthInquiriesCount - previousMonthInquiriesCount) / (decimal)previousMonthInquiriesCount) * 100m,
+                2,
+                MidpointRounding.AwayFromZero);
+
+        var activeInquiriesCount = await _appDbContext.Inquiries
+            .AsNoTracking()
+            .CountAsync(i =>
+                i.StudioId == id &&
+                (i.Status == InquiryStatus.Accepted || i.Status == InquiryStatus.Confirmed),
+                cancellationToken);
+
+        var pendingInquiriesCount = await _appDbContext.Inquiries
+            .AsNoTracking()
+            .CountAsync(i =>
+                i.StudioId == id &&
+                i.Status == InquiryStatus.Submitted,
+                cancellationToken);
+
+        var totalRevenueThisMonthDecimal = await _appDbContext.Payments
+            .AsNoTracking()
+            .Where(p =>
+                p.StudioId == id &&
+                p.Status == PaymentStatus.Completed &&
+                p.CompletedAt >= currentMonthStart &&
+                p.CompletedAt < nextMonthStart)
+            .SumAsync(p => (decimal?)p.Amount, cancellationToken) ?? 0m;
+
+        var latestThreeInquiries = await _appDbContext.Inquiries
+            .AsNoTracking()
+            .Where(i => i.StudioId == id)
+            .OrderByDescending(i => i.CreatedAt)
+            .Take(3)
+            .Select(i => new InquiryDetail(
+                i.Id,
+                i.Consumer.FullName,
+                i.Event.EventType.Name,
+                i.Event.EventDate))
+            .ToListAsync(cancellationToken);
+
+        var ratingAggregate = await _appDbContext.Reviews
+            .AsNoTracking()
+            .Where(r => r.StudioId == id)
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                AverageRating = g.Average(x => x.Rating),
+                ReviewCount = g.Count()
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var latestReview = await _appDbContext.Reviews
+            .AsNoTracking()
+            .Where(r => r.StudioId == id)
+            .OrderByDescending(r => r.ModifiedAt)
+            .Select(r => new
+            {
+                ConsumerName = r.Consumer.FullName,
+                r.Rating,
+                r.Comment,
+                r.ModifiedAt
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var galleries = await _appDbContext.Galleries
+            .AsNoTracking()
+            .Where(g =>
+                g.Inquiry.StudioId == id &&
+                (g.GalleryStatus == GalleryStatus.Uploaded ||
+                 g.GalleryStatus == GalleryStatus.UnderReview ||
+                 g.GalleryStatus == GalleryStatus.ChangesRequested))
+            .OrderByDescending(g => g.ModifiedAt)
+            .Take(2)
+            .Select(g => new
+            {
+                g.Id,
+                EventName = g.Inquiry.Event.Title,
+                Status = g.GalleryStatus.ToString(),
+                g.GalleryCover
+            })
+            .ToListAsync(cancellationToken);
+
+        var galleryDetails = await Task.WhenAll(galleries.Select(async g =>
+            new GalleryDetail(
+                g.Id,
+                g.EventName,
+                g.Status,
+                string.IsNullOrWhiteSpace(g.GalleryCover)
+                    ? string.Empty
+                    : await _minioService.GeneratePresignedUrlAsync(g.GalleryCover))));
+
+        var statsData = new StatsData(
+            currentMonthInquiriesCount,
+            percentageIncrease,
+            activeInquiriesCount,
+            pendingInquiriesCount,
+            Convert.ToInt64(decimal.Round(totalRevenueThisMonthDecimal, 0, MidpointRounding.AwayFromZero)));
+
+        var ratingDetails = new RatingDetails(
+            ratingAggregate?.AverageRating ?? 0m,
+            ratingAggregate?.ReviewCount ?? 0m,
+            latestReview == null ? null :
+            new ReviewerDetails(latestReview.Rating, latestReview.Comment, DateOnly.FromDateTime(latestReview.ModifiedAt), latestReview.ConsumerName));
+
+        return new GetStudioDetailsByIdResponse(
+            statsData,
+            latestThreeInquiries,
+            ratingDetails,
+            galleryDetails);
     }
 }
