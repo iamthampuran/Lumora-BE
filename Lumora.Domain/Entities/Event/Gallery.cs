@@ -13,6 +13,7 @@ public class Gallery : BaseEntity
     public string FolderLink { get; private set; } = string.Empty;
     public DateTime? UploadedAt { get; set; }
     public DateTime? ApprovedAt { get; set; }
+    public string GalleryCover { get; set; } = null!;
 
     //navigation property
     public virtual Inquiry Inquiry { get; set; } = null!;
