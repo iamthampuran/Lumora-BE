@@ -23,29 +23,38 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
         _minioService = minioService ?? throw new ArgumentNullException(nameof(minioService));
     }
 
-    public async Task<PaginatedResponse<FindStudiosQueryResponse>> GetRecommendedStudiosAsync(Event eventData, StudioFilterOptions? filterOptions, StudioSortOption sortOption, PaginationOptions paginationOptions, CancellationToken cancellationToken)
+    public async Task<PaginatedResponse<FindStudiosQueryResponse>> GetRecommendedStudiosAsync(
+        Event eventData,
+        StudioFilterOptions? filterOptions,
+        StudioSortOption sortOption,
+        PaginationOptions paginationOptions,
+        CancellationToken cancellationToken)
     {
-        IQueryable<StudioProfile> query = _appDbContext.StudioProfiles.AsNoTracking().Include(s => s.Tags);
+        IQueryable<StudioProfile> query = _appDbContext.StudioProfiles
+            .AsNoTracking()
+            .Include(s => s.Tags)
+            .ThenInclude(st => st.Tag);
 
         if (filterOptions != null)
         {
             if (filterOptions.MaxDistance != null)
             {
-                query.Where(s => CoordinateHelper.CalculateDistance(s.Location, eventData.Location) <= s.ServiceRadius.Distance);
+                query = query.Where(s =>
+                    CoordinateHelper.CalculateDistance(s.Location, eventData.Location) <= (double)filterOptions.MaxDistance.Value);
             }
 
             if (filterOptions.MinRatings != null)
             {
-                query.Where(s => s.AverageRating >= filterOptions.MinRatings);
+                query = query.Where(s => s.AverageRating >= filterOptions.MinRatings);
             }
         }
 
-        var eventTagIds = eventData.EventTags.Select(s => s.Id).ToList();
+        var eventTagIds = eventData.EventTags.Select(et => et.TagId).ToList();
 
-        if (eventTagIds.Count > 0)
-        {
-            query = query.Where(s => s.Tags.Any(st => eventTagIds.Contains(st.TagId)));
-        }
+        //if (eventTagIds.Count > 0)
+        //{
+        //    query = query.Where(s => s.Tags.Any(st => eventTagIds.Contains(st.TagId)));
+        //}
 
         var sortedQuery = sortOption switch
         {
@@ -96,7 +105,7 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                 );
         }));
 
-        return new PaginatedResponse<FindStudiosQueryResponse>(finalMappedData, pageResult.TotalPages, pageResult.PageCount, pageResult.PageSize);
+        return new PaginatedResponse<FindStudiosQueryResponse>(finalMappedData, pageResult.TotalPages, pageResult.CurrentPage, pageResult.PageSize);
     }
 
     //public async Task<GetStudioByIdResponse?> GetStudioDetailsByIdAsync(Guid id)
