@@ -1,14 +1,14 @@
 ﻿using FluentValidation;
 
-namespace Lumora.Application.Features.Studio.Commands.UpdateLogo;
+namespace Lumora.Application.Features.Studio.Commands.UpdateCover;
 
-public class UpdateLogoCommandValidator : AbstractValidator<UpdateLogoCommand>
+public class UpdateCoverCommandValidator : AbstractValidator<UpdateCoverCommand>
 {
-    public UpdateLogoCommandValidator()
+    public UpdateCoverCommandValidator()
     {
         RuleFor(x => x.StudioId)
-            .NotNull()
-            .WithMessage("Studio id cannot be null");
+           .NotNull()
+           .WithMessage("Studio id cannot be null");
 
         RuleFor(x => x.File)
             .NotNull()
@@ -16,7 +16,7 @@ public class UpdateLogoCommandValidator : AbstractValidator<UpdateLogoCommand>
             .WithMessage("File cannot be empty");
 
         RuleFor(x => x.File.Length)
-            .LessThanOrEqualTo(2 * 1024 * 1024)
+            .LessThanOrEqualTo(5 * 1024 * 1024)
             .WithMessage("Max file size is 2MB");
 
         RuleFor(x => x.ContentType)

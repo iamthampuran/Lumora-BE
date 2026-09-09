@@ -35,9 +35,28 @@ public class StudioProfile : BaseEntity
     public virtual ICollection<Review> Reviews { get; set; } = [];
     public virtual ICollection<PortfolioImage> PortfolioImages { get; set; } = [];
 
+    public ProfileCompletionResult GetProfileCompletion()
+    {
+        var steps = new List<ProfileCompletionStep>
+        {
+            new("Upload Studio Logo",        "Upload your studio logo to build recognition and trust.",  LogoUrl != null),
+            new("Upload Cover Image",        "Showcase your brand with a beautiful cover photo.",        CoverImageUrl != null),
+            new("Add Portfolio Photos",      "Add your best work and highlight your style.",             PortfolioImages.Count > 0),
+            new("Add Photography Styles",    "Select the styles and genres you specialize in.",          Tags.Count > 0),
+            new("Add Team Members",          "Invite your team and collaborate on projects.",            Employees.Count > 0),
+            new("Set Service Area",          "Define the locations and radius you serve.",               Location != null && ServiceRadius != null),
+        };
 
+        var completedCount = steps.Count(s => s.IsCompleted);
+        var percentage = (int)Math.Round((double)completedCount / steps.Count * 100);
+
+        return new ProfileCompletionResult(percentage, steps);
+    }
 
     //Methods
     public void UpdateLocation (Coordinates newLocation) => Location = newLocation;
     public void UpdateServiceRadius(ServiceRadius newServiceRadius) => ServiceRadius = newServiceRadius;
 }
+
+public record ProfileCompletionStep(string Title, string Description, bool IsCompleted);
+public record ProfileCompletionResult(int Percentage, IReadOnlyList<ProfileCompletionStep> Steps);

@@ -19,7 +19,6 @@ public static class PorfolioImageConfiguration
             .HasMaxLength(2000);
 
         entity.Property(p => p.Title)
-            .IsRequired()
             .HasMaxLength(200);
 
         entity.Property(p => p.DisplayOrder)
