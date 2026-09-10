@@ -24,29 +24,38 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
         _minioService = minioService ?? throw new ArgumentNullException(nameof(minioService));
     }
 
-    public async Task<PaginatedResponse<FindStudiosQueryResponse>> GetRecommendedStudiosAsync(Event eventData, StudioFilterOptions? filterOptions, StudioSortOption sortOption, PaginationOptions paginationOptions, CancellationToken cancellationToken)
+    public async Task<PaginatedResponse<FindStudiosQueryResponse>> GetRecommendedStudiosAsync(
+        Event eventData,
+        StudioFilterOptions? filterOptions,
+        StudioSortOption sortOption,
+        PaginationOptions paginationOptions,
+        CancellationToken cancellationToken)
     {
-        IQueryable<StudioProfile> query = _appDbContext.StudioProfiles.AsNoTracking().Include(s => s.Tags);
+        IQueryable<StudioProfile> query = _appDbContext.StudioProfiles
+            .AsNoTracking()
+            .Include(s => s.Tags)
+            .ThenInclude(st => st.Tag);
 
         if (filterOptions != null)
         {
             if (filterOptions.MaxDistance != null)
             {
-                query.Where(s => CoordinateHelper.CalculateDistance(s.Location, eventData.Location) <= s.ServiceRadius.Distance);
+                query = query.Where(s =>
+                    CoordinateHelper.CalculateDistance(s.Location, eventData.Location) <= (double)filterOptions.MaxDistance.Value);
             }
 
             if (filterOptions.MinRatings != null)
             {
-                query.Where(s => s.AverageRating >= filterOptions.MinRatings);
+                query = query.Where(s => s.AverageRating >= filterOptions.MinRatings);
             }
         }
 
-        var eventTagIds = eventData.EventTags.Select(s => s.Id).ToList();
+        var eventTagIds = eventData.EventTags.Select(et => et.TagId).ToList();
 
-        if (eventTagIds.Count > 0)
-        {
-            query = query.Where(s => s.Tags.Any(st => eventTagIds.Contains(st.TagId)));
-        }
+        //if (eventTagIds.Count > 0)
+        //{
+        //    query = query.Where(s => s.Tags.Any(st => eventTagIds.Contains(st.TagId)));
+        //}
 
         var sortedQuery = sortOption switch
         {
@@ -71,12 +80,13 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
         var finalQuery = sortedQuery.Select(s => new
         {
             s.Id,
+            s.StudioName,
             s.Location,
             AverageRating = s.AverageRating ?? 0,
             s.ReviewCount,
             TagNames = s.Tags.Select(t => t.Tag.Name).ToList(),
             s.CoverImageUrl,
-            s.StartingPrice
+            s.MinPrice
         });
 
         var pageResult = await finalQuery.ToPaginatedResponseAsync(paginationOptions.PageCount, paginationOptions.PageSize, cancellationToken);
@@ -88,16 +98,17 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
 
             return new FindStudiosQueryResponse(
                 s.Id,
+                s.StudioName,
                 distance,
                 s.AverageRating,
                 s.ReviewCount,
                 s.TagNames,
                 coverUrl,
-                s.StartingPrice
+                s.MinPrice
                 );
         }));
 
-        return new PaginatedResponse<FindStudiosQueryResponse>(finalMappedData, pageResult.TotalPages, pageResult.PageCount, pageResult.PageSize);
+        return new PaginatedResponse<FindStudiosQueryResponse>(finalMappedData, pageResult.TotalPages, pageResult.CurrentPage, pageResult.PageSize);
     }
 
     //public async Task<GetStudioByIdResponse?> GetStudioDetailsByIdAsync(Guid id)
@@ -145,7 +156,7 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                 CompletedInquiryCount = studio.Inquiries.Count(i => i.Event.Status == Domain.Enums.EventStatus.Complete),
                 studio.MinPrice,
                 studio.MaxPrice,
-                LocationText = studio.Location.ToString(),
+                LocationText = studio.Location.LocationName,
                 studio.Location.Latitude,
                 studio.Location.Longitude,
                 RadiusType = studio.ServiceRadius.RadiusType.ToString(),
