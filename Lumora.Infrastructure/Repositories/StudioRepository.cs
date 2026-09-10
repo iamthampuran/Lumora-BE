@@ -79,12 +79,13 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
         var finalQuery = sortedQuery.Select(s => new
         {
             s.Id,
+            s.StudioName,
             s.Location,
             AverageRating = s.AverageRating ?? 0,
             s.ReviewCount,
             TagNames = s.Tags.Select(t => t.Tag.Name).ToList(),
             s.CoverImageUrl,
-            s.StartingPrice
+            s.MinPrice
         });
 
         var pageResult = await finalQuery.ToPaginatedResponseAsync(paginationOptions.PageCount, paginationOptions.PageSize, cancellationToken);
@@ -96,12 +97,13 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
 
             return new FindStudiosQueryResponse(
                 s.Id,
+                s.StudioName,
                 distance,
                 s.AverageRating,
                 s.ReviewCount,
                 s.TagNames,
                 coverUrl,
-                s.StartingPrice
+                s.MinPrice
                 );
         }));
 
@@ -153,7 +155,7 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                 CompletedInquiryCount = studio.Inquiries.Count(i => i.Event.Status == Domain.Enums.EventStatus.Complete),
                 studio.MinPrice,
                 studio.MaxPrice,
-                LocationText = studio.Location.ToString(),
+                LocationText = studio.Location.LocationName,
                 studio.Location.Latitude,
                 studio.Location.Longitude,
                 RadiusType = studio.ServiceRadius.RadiusType.ToString(),
