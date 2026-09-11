@@ -1,7 +1,7 @@
 ﻿using Lumora.Application.Contracts.Persistence;
 using Lumora.Application.Contracts.Services;
 using Lumora.Application.Features.Consumer.Queries.FindStudios;
-using Lumora.Application.Features.Studio.Queries.GetStudioById;
+using Lumora.Application.Features.Consumer.Queries.GetStudioById;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Entities.Event;

@@ -1,4 +1,4 @@
-﻿namespace Lumora.Application.Features.Studio.Queries.GetStudioById;
+﻿namespace Lumora.Application.Features.Consumer.Queries.GetStudioById;
 
 public class GetStudioByIdResponse
 {

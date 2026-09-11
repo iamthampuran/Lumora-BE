@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
+using Lumora.Application.Features.Consumer.Queries.GetStudioById;
 using Lumora.Application.Features.Studio.Commands;
 using Lumora.Application.Features.Studio.Commands.AddEmployees;
 using Lumora.Application.Features.Studio.Commands.AddPortfolioImage;
@@ -8,7 +9,6 @@ using Lumora.Application.Features.Studio.Commands.UpdateCover;
 using Lumora.Application.Features.Studio.Commands.UpdateLogo;
 using Lumora.Application.Features.Studio.Commands.UpdatePortfolioImage;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
-using Lumora.Application.Features.Studio.Queries.GetStudioById;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
 using Lumora.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Mvc;

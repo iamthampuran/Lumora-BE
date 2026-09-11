@@ -4,7 +4,7 @@ using Lumora.Application.Contracts.Persistence;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Lumora.Application.Features.Studio.Queries.GetStudioById;
+namespace Lumora.Application.Features.Consumer.Queries.GetStudioById;
 
 public class GetStudioByIdQueryHandler(ILogger<GetStudioByIdQueryHandler> logger, IStudioRepository studioRepository)
 {
