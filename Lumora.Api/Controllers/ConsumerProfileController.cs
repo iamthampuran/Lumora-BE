@@ -6,6 +6,7 @@ using Lumora.Application.Features.Consumer.Queries.FindStudios;
 using Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
 using Lumora.Application.Features.Consumer.Queries.GetEventById;
 using Lumora.Application.Features.Consumer.Queries.GetInquiryWidget;
+using Lumora.Application.Features.Consumer.Queries.GetStudioById;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -80,5 +81,14 @@ public class ConsumerProfileController(IMessageBus messageBus) : ControllerBase
             studioSortOption));
         return result.ToActionResult(this);
     }
-    
+
+    [HttpGet("studio-details/{id}")]
+    [ProducesResponseType(typeof(GetStudioByIdResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<GetStudioByIdResponse>> GetStudioDetailsById([FromRoute] Guid id, [FromQuery] Guid? eventId, CancellationToken cancellationToken)
+    {
+        var result = await messageBus.InvokeAsync<Result<GetStudioByIdResponse>>(new GetStudioByIdQuery(id, eventId), cancellationToken);
+        return result.ToActionResult(this);
+    }
+
 }

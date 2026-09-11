@@ -9,13 +9,14 @@ public class GetStudioByIdResponse
     public List<TagDetails> Tags { get; set; } = [];
     public List<PortfolioDetails> PortfolioDetails { get; set; } = [];
     public List<ReviewDetails> Reviews { get; set; } = [];
+    public bool? IsAvailableOnDate { get; init; }
 
 }
 
 public record StudioIdentityResponse(Guid id, string studioName, string? about, string? logoUrl, string? coverImageUrl);
 public record RatingStats(decimal averageRating, int reviewCount, int teamMembersCount, int projectsCompleted);
 public record PricingDetails(decimal minPrice, decimal maxPrice);
-public record GeneralInformation(LocationDetails locationDetails, string phone, string email);
+public record GeneralInformation(LocationDetails locationDetails, string phone, string email, string? websiteUrl);
 public record LocationDetails(string city, double latitude, double longitude, string serviceRadiusType, double? distance);
 public record TagDetails(Guid id, string name);
 public record PortfolioDetails(Guid id, string imageUrl, string? title, int displayOrder); 

@@ -10,7 +10,7 @@ namespace Lumora.Application.Contracts.Persistence;
 
 public interface IStudioRepository : IGenericRepository<StudioProfile>
 {
-    Task<GetStudioByIdResponse?> GetStudioDetailsByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task<GetStudioByIdResponse?> GetStudioDetailsByIdAsync(Guid id, bool? isAvailable, CancellationToken cancellationToken);
     Task<PaginatedResponse<FindStudiosQueryResponse>> GetRecommendedStudiosAsync(Event eventData, StudioFilterOptions? filterOptions, StudioSortOption sortOption, PaginationOptions paginationOptions, CancellationToken cancellationToken);
     Task<GetStudioDetailsByIdResponse?> GetStudioDashboardByIdAsync(Guid id, CancellationToken cancellationToken);
 }
