@@ -1,7 +1,7 @@
 ﻿using Lumora.Application.Contracts.Persistence;
 using Lumora.Application.Contracts.Services;
 using Lumora.Application.Features.Consumer.Queries.FindStudios;
-using Lumora.Application.Features.Studio.Queries.GetStudioById;
+using Lumora.Application.Features.Consumer.Queries.GetStudioById;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Entities.Event;
@@ -34,7 +34,17 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
         IQueryable<StudioProfile> query = _appDbContext.StudioProfiles
             .AsNoTracking()
             .Include(s => s.Tags)
-            .ThenInclude(st => st.Tag);
+            .ThenInclude(st => st.Tag)
+            .Include(s => s.Employees)
+            .Include(s => s.PortfolioImages)
+            .Where(s =>
+                    s.LogoUrl != null &&
+                    s.CoverImageUrl != null &&
+                    s.PortfolioImages.Any() &&
+                    s.Tags.Any() &&
+                    s.Employees.Any() &&
+                    s.Location != null &&
+                    s.ServiceRadius != null);
 
         if (filterOptions != null)
         {
@@ -138,7 +148,7 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
 
     //}
 
-    public async Task<GetStudioByIdResponse?> GetStudioDetailsByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<GetStudioByIdResponse?> GetStudioDetailsByIdAsync(Guid id, bool? isAvailable, CancellationToken cancellationToken)
     {
         var studio = await _appDbContext.StudioProfiles
             .AsNoTracking()
@@ -150,6 +160,7 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                 studio.Description,
                 studio.LogoUrl,
                 studio.CoverImageUrl,
+                studio.Website,
                 AverageRating = studio.Reviews.Select(r => (decimal?)r.Rating).Average() ?? 0m,
                 ReviewCount = studio.Reviews.Count(),
                 EmployeeCount = studio.Employees.Count(),
@@ -189,6 +200,8 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                 pi.Title,
                 pi.DisplayOrder)));
 
+
+
         return new GetStudioByIdResponse
         {
             Identity = new(
@@ -196,7 +209,8 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                 studio.StudioName,
                 studio.Description,
                 logoUrl,
-                coverUrl),
+                coverUrl
+                ),
 
             RatingStats = new(
                 studio.AverageRating,
@@ -216,7 +230,8 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                     studio.RadiusType,
                     studio.Distance),
                 studio.Phone,
-                studio.Email),
+                studio.Email,
+                studio.Website),
 
             Tags = studio.Tags
                 .Select(t => new TagDetails(t.Id, t.Name))
@@ -226,7 +241,8 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
 
             Reviews = studio.Reviews.OrderByDescending(r => r.ModifiedAt).Take(5)
                 .Select(r => new ReviewDetails(r.Id, r.ConsumerName, r.Rating, r.Comment, r.ModifiedAt))
-                .ToList()
+                .ToList(),
+            IsAvailableOnDate = isAvailable
         };
     }
 

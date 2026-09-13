@@ -9,9 +9,9 @@ namespace Lumora.Domain.Entities.Event;
 
 public class Inquiry : BaseEntity
 {
-    public Guid EventId { get; private set; }
-    public Guid StudioId { get; private set; }
-    public Guid ConsumerId { get; private set; }
+    public Guid EventId { get; set; }
+    public Guid StudioId { get; set; }
+    public Guid ConsumerId { get; set; }
     public string? Message { get; set; }
     public InquiryStatus Status { get; set; } = InquiryStatus.Submitted;
     public string? RejectionStatus {  get; set; }

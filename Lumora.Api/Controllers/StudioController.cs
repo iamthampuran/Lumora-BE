@@ -1,6 +1,5 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
-using Lumora.Application.Features.Studio.Commands;
 using Lumora.Application.Features.Studio.Commands.AddEmployees;
 using Lumora.Application.Features.Studio.Commands.AddPortfolioImage;
 using Lumora.Application.Features.Studio.Commands.AddTagsToStudio;
@@ -8,7 +7,6 @@ using Lumora.Application.Features.Studio.Commands.UpdateCover;
 using Lumora.Application.Features.Studio.Commands.UpdateLogo;
 using Lumora.Application.Features.Studio.Commands.UpdatePortfolioImage;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
-using Lumora.Application.Features.Studio.Queries.GetStudioById;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
 using Lumora.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +18,6 @@ namespace Lumora.Api.Controllers
     [ApiController]
     public class StudioController(IMessageBus messageBus) : ControllerBase
     {
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(GetStudioByIdResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<GetStudioByIdResponse>> GetStudioDetailsById([FromRoute] Guid id, CancellationToken cancellationToken)
-        {
-            var result = await messageBus.InvokeAsync<Result<GetStudioByIdResponse>>(new GetStudioByIdQuery(id), cancellationToken);
-            return result.ToActionResult(this);
-        }
 
         [HttpPatch("{id}/update-logo")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]

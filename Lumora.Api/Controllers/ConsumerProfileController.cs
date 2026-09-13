@@ -2,10 +2,12 @@
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Consumer.Commands.AddProfilePicture;
 using Lumora.Application.Features.Consumer.Commands.CreateEvent;
+using Lumora.Application.Features.Consumer.Commands.CreateInquiry;
 using Lumora.Application.Features.Consumer.Queries.FindStudios;
 using Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
 using Lumora.Application.Features.Consumer.Queries.GetEventById;
 using Lumora.Application.Features.Consumer.Queries.GetInquiryWidget;
+using Lumora.Application.Features.Consumer.Queries.GetStudioById;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -80,5 +82,27 @@ public class ConsumerProfileController(IMessageBus messageBus) : ControllerBase
             studioSortOption));
         return result.ToActionResult(this);
     }
-    
+
+    [HttpGet("studio-details/{id}")]
+    [ProducesResponseType(typeof(GetStudioByIdResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<GetStudioByIdResponse>> GetStudioDetailsById([FromRoute] Guid id, [FromQuery] Guid? eventId, CancellationToken cancellationToken)
+    {
+        var result = await messageBus.InvokeAsync<Result<GetStudioByIdResponse>>(new GetStudioByIdQuery(id, eventId), cancellationToken);
+        return result.ToActionResult(this);
+    }
+
+    [HttpPost("{id}/create/inquiry")]
+    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.Created)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    public async Task<ActionResult<Guid>> CreateInquiry([FromRoute] Guid id, [FromBody] CreateInquiryCommand command, CancellationToken cancellationToken)
+    {
+        if (command.consumerId != id)
+        {
+            return BadRequest("Consumer ID in the route does not match the Consumer ID in the request body.");
+        }
+        var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken);
+        return result.ToActionResult(this);
+    }
+
 }
