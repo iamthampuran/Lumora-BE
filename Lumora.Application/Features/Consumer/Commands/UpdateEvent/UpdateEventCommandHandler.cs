@@ -2,6 +2,7 @@
 using Lumora.Application.Contracts.Common;
 using Lumora.Application.Contracts.Persistence;
 using Lumora.Domain.Entities.Event;
+using Lumora.Domain.Enums;
 
 namespace Lumora.Application.Features.Consumer.Commands.UpdateEvent;
 
@@ -9,10 +10,15 @@ public class UpdateEventCommandHandler(IEventRepository eventRepository, IEventT
 {
     public async Task<Result<Guid>> Handle(UpdateEventCommand command, CancellationToken cancellationToken)
     {
-        var existingEvent = await eventRepository.GetFirstAsync(e => e.Id == command.Id, null, includes: [e => e.EventTags], false, cancellationToken);
+        var existingEvent = await eventRepository.GetFirstAsync(e => e.Id == command.Id, null, includes: [e => e.EventTags, e => e.Inquiries], false, cancellationToken);
         if (existingEvent is null)
         {
             return Result.NotFound();
+        }
+
+        if (existingEvent.Inquiries.Any(i => i.Status == InquiryStatus.Accepted))
+        {
+            return Result.Error("Cannot update event with accepted inquiries.");
         }
 
         Guid eventCategoryId;
