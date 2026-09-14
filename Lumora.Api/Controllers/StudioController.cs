@@ -9,6 +9,7 @@ using Lumora.Application.Features.Studio.Commands.UpdatePortfolioImage;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
 using Lumora.Domain.Entities.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Wolverine;
@@ -95,6 +96,7 @@ namespace Lumora.Api.Controllers
             return result.ToActionResult(this);
         }
 
+        [Authorize]
         [HttpGet("{id}/dashboard")]
         [ProducesResponseType(typeof(GetStudioDetailsByIdResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
