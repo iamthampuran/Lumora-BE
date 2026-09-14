@@ -6,7 +6,7 @@ public class BaseEntity
     public DateTime CreatedAt { get;  set; } = DateTime.UtcNow;
     public DateTime ModifiedAt { get;  set; } = DateTime.UtcNow;
     public bool IsActive { get; set; }
-    public DateTime? DeletedAt { get; private set; }
+    public DateTime? DeletedAt { get; set; }
     public string CreatedBy { get;  set; } = null!;
     public string ModifiedBy { get;  set; } = null!;
 

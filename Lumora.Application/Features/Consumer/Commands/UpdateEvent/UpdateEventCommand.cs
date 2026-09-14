@@ -1,0 +1,6 @@
+﻿using Lumora.Domain.Entities.Common.ValueObjects;
+
+namespace Lumora.Application.Features.Consumer.Commands.UpdateEvent;
+
+public record UpdateEventCommand(Guid Id, string Title, Guid? EventCategoryId, string? CustomEventCategory, decimal Budget, Coordinates Location, DateOnly EventDate, decimal Duration, IEnumerable<Guid> TagIds, Guid ConsumerId,
+    string? SpecialRequirements);
