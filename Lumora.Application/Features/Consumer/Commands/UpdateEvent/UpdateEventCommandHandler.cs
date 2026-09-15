@@ -60,8 +60,7 @@ public class UpdateEventCommandHandler(IEventRepository eventRepository, IEventT
         {
             if (!commandTagIds.Contains(eventTag.TagId))
             {
-                eventTag.IsActive = false;
-                eventTag.DeletedAt = DateTime.UtcNow;
+                eventTag.DeleteEntity();
             }
         }
 

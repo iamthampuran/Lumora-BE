@@ -53,7 +53,6 @@ public class UnitOfWork(
                     entry.Entity.CreatedBy = caller;
                     entry.Entity.ModifiedAt = DateTime.UtcNow;
                     entry.Entity.ModifiedBy = caller;
-                    entry.Entity.IsActive = true;
                     break;
             }
         }
@@ -78,7 +77,7 @@ public class UnitOfWork(
         var userId = GetClaimValue(claims, ClaimTypes.NameIdentifier, "nameid", "sub");
 
         if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(email))
-            return $"{name} <{email}>";
+            return $"{name} ({email})";
 
         return name ?? email ?? userId ?? "Program";
     }
