@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
+using Lumora.Application.Features.Consumer.Commands.DeleteEvent;
 using Lumora.Application.Features.Consumer.Commands.UpdateEvent;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,10 @@ using Wolverine;
 namespace Lumora.Api.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class EventController(IMessageBus messageBus) : ControllerBase
     {
-        [Authorize]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -26,5 +27,16 @@ namespace Lumora.Api.Controllers
             var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken);
             return result.ToActionResult(this);
         }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Guid>> DeleteEvent([FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<Guid>>(new DeleteEventCommand(id), cancellationToken);
+            return result.ToActionResult(this);
+        }
+
     }
 }
