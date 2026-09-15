@@ -83,29 +83,29 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 
-    if (builder.Environment.IsDevelopment())
+    options.Events = new JwtBearerEvents
     {
-        options.Events = new JwtBearerEvents
+        OnMessageReceived = context =>
         {
-            OnAuthenticationFailed = context =>
+            // 1) Standard Authorization header support
+            var authHeader = context.Request.Headers.Authorization.ToString();
+            if (!string.IsNullOrWhiteSpace(authHeader) &&
+                authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
-                var logger = context.HttpContext.RequestServices
-                    .GetRequiredService<ILoggerFactory>()
-                    .CreateLogger("JwtAuthentication");
-                logger.LogWarning(context.Exception, "JWT authentication failed.");
-                return Task.CompletedTask;
-            },
-            OnChallenge = context =>
-            {
-                var logger = context.HttpContext.RequestServices
-                    .GetRequiredService<ILoggerFactory>()
-                    .CreateLogger("JwtAuthentication");
-                logger.LogWarning("JWT challenge issued. Error: {Error}, Description: {Description}",
-                    context.Error, context.ErrorDescription);
+                context.Token = authHeader["Bearer ".Length..].Trim();
                 return Task.CompletedTask;
             }
-        };
-    }
+
+            // 2) Cookie support (accept both names)
+            if (context.Request.Cookies.TryGetValue("accessToken", out var token) ||
+                context.Request.Cookies.TryGetValue("lumora_access_token", out token))
+            {
+                context.Token = token;
+            }
+
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddAuthorization();

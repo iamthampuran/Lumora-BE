@@ -12,5 +12,5 @@ public record GetEventForEditQueryResponse(Guid Id,
     decimal Budget,
     decimal Duration,
     string? SpecialRequirements,
-    IEnumerable<Tag> Tags);
+    Dictionary<Guid, string> Tags);
 

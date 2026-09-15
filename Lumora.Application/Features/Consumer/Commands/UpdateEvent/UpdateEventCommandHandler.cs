@@ -21,6 +21,18 @@ public class UpdateEventCommandHandler(IEventRepository eventRepository, IEventT
             return Result.Error("Cannot update event with accepted inquiries.");
         }
 
+        var userDetails = unitOfWork.GetCurrentUserDetails();
+
+        if (userDetails is null || userDetails.ConsumerId is null)
+        {
+            return Result.Unauthorized("User is not authorized");
+        }
+
+        if (userDetails.ConsumerId != command.ConsumerId)
+        {
+            return Result.Unauthorized("User cannot change the details of this event");
+        }
+
         Guid eventCategoryId;
         if (command.EventCategoryId == null) //not an existing event type
         {

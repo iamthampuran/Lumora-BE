@@ -3,6 +3,7 @@ using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Consumer.Commands.AddProfilePicture;
 using Lumora.Application.Features.Consumer.Commands.CreateEvent;
 using Lumora.Application.Features.Consumer.Commands.CreateInquiry;
+using Lumora.Application.Features.Consumer.Commands.UpdateEvent;
 using Lumora.Application.Features.Consumer.Queries.FindStudios;
 using Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
 using Lumora.Application.Features.Consumer.Queries.GetEventById;
