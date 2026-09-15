@@ -32,7 +32,8 @@ public class UpdatePorfolioImageCommandHandler(ILogger<UpdatePorfolioImageComman
             image.ImageUrl = uploadResult.fileKey;
         }
 
-        image.IsActive = !command.IsDeleted;
+        if (command.IsDeleted)
+            image.DeleteEntity();
 
         if (command.Order != null)
             image.DisplayOrder = command.Order.Value;
