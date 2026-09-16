@@ -21,14 +21,21 @@ public class Verify2FALoginCommandHandler(
         if (!user.IsTwoFactorEnabled || string.IsNullOrEmpty(user.TwoFactorSecret))
             return Result.Error("2FA is not enabled for this user.");
 
-        // Validate the 6-digit code
-        bool isValid = twoFactorAuthService.ValidateCode(user.TwoFactorSecret, command.Code);
+        var isTotpValid = twoFactorAuthService.ValidateCode(user.TwoFactorSecret, command.Code);
+        var isBackupCodeValid = false;
 
-        // (Optional: You can also check if command.Code exists in user.TwoFactorBackupCodes here)
+        if (!isTotpValid)
+        {
+            isBackupCodeValid = twoFactorAuthService.TryConsumeBackupCode(command.Code, user.TwoFactorBackupCodes, out var updatedJson);
+            if (isBackupCodeValid)
+            {
+                user.TwoFactorBackupCodes = updatedJson;
+            }
+        }
 
-        if (!isValid) return Result.Error("Invalid authenticator code.");
+        if (!isTotpValid && !isBackupCodeValid)
+            return Result.Error("Invalid authenticator/backup code.");
 
-        // Code is valid! Issue the tokens.
         var result = new SignInUserResponse(
             await authService.GenerateAccessTokenAsync(user),
             authService.GenerateRefreshTokenAsync(user).refreshToken,
