@@ -2,9 +2,13 @@
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Features.Auth.Commands.CreateConsumer;
 using Lumora.Application.Features.Auth.Commands.CreateStudio;
+using Lumora.Application.Features.Auth.Commands.Initiate2FASetup;
 using Lumora.Application.Features.Auth.Commands.LogoutUser;
 using Lumora.Application.Features.Auth.Commands.SignInUser;
 using Lumora.Application.Features.Auth.Commands.SignupAccount;
+using Lumora.Application.Features.Auth.Commands.VerifyAndEnable2FA;
+using Lumora.Application.Features.Auth.Queries.GetConsumerData;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Wolverine;
@@ -68,6 +72,31 @@ namespace Lumora.Api.Controllers
             return result.ToActionResult(this);
         }
 
+        [Authorize]
+        [HttpPost("2fa/initiate")]
+        [ProducesResponseType(typeof(Initiate2FASetupResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Initiate2FASetupResponse>> Initiate2FASetup([FromBody] Initiate2FASetupCommand command, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<Initiate2FASetupResponse>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [Authorize]
+        [HttpPost("2fa/verify-and-enable")]
+        [ProducesResponseType(typeof(List<string>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<List<string>>> VerifyAndEnable2FA([FromBody] VerifyAndEnable2FACommand command, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<List<string>>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
         [HttpDelete("logout/{userId}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(int), (int)HttpStatusCode.BadRequest)]
@@ -76,5 +105,19 @@ namespace Lumora.Api.Controllers
             var result = await messageBus.InvokeAsync<Result<int>>(new LogoutUserCommand(userId), cancellationToken);
             return result.ToActionResult(this);
         }
+
+        [Authorize]
+        [HttpGet()]
+        [ProducesResponseType(typeof(GetConsumerDataResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public async Task<ActionResult<GetConsumerDataResponse>> GetConsumerData(CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<GetConsumerDataResponse>>(new GetConsumerDataQuery(), cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+
+
     }
 }
