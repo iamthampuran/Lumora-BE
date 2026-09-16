@@ -6,6 +6,7 @@ using Lumora.Application.Features.Auth.Commands.Initiate2FASetup;
 using Lumora.Application.Features.Auth.Commands.LogoutUser;
 using Lumora.Application.Features.Auth.Commands.SignInUser;
 using Lumora.Application.Features.Auth.Commands.SignupAccount;
+using Lumora.Application.Features.Auth.Commands.Verify2FALogin;
 using Lumora.Application.Features.Auth.Commands.VerifyAndEnable2FA;
 using Lumora.Application.Features.Auth.Queries.GetConsumerData;
 using Microsoft.AspNetCore.Authorization;
@@ -117,6 +118,15 @@ namespace Lumora.Api.Controllers
             return result.ToActionResult(this);
         }
 
+        [HttpPost("2fa/verify-login")]
+        [ProducesResponseType(typeof(SignInUserResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<SignInUserResponse>> VerifyLogin(Verify2FALoginCommand command, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<SignInUserResponse>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
 
 
     }
