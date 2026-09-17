@@ -1,6 +1,7 @@
 ﻿using Lumora.Application.Contracts.Common;
 using Lumora.Application.Contracts.Persistence;
 using Lumora.Application.Contracts.Services;
+using Lumora.Application.Services;
 using Lumora.Infrastructure.Data;
 using Lumora.Infrastructure.Repositories;
 using Lumora.Infrastructure.Services;
@@ -32,6 +33,7 @@ public static class InfrastructureServiceRegistration
 
         //application services registration
         services.AddScoped<IMinioService, MinioService>();
+        services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>();
 
         //repository registration
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
