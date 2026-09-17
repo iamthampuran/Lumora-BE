@@ -4,6 +4,7 @@ using Lumora.Application.Features.Consumer.Commands.AddProfilePicture;
 using Lumora.Application.Features.Consumer.Commands.CreateEvent;
 using Lumora.Application.Features.Consumer.Commands.CreateInquiry;
 using Lumora.Application.Features.Consumer.Commands.UpdateEvent;
+using Lumora.Application.Features.Consumer.Commands.UpdatePersonalInformation;
 using Lumora.Application.Features.Consumer.Queries.FindStudios;
 using Lumora.Application.Features.Consumer.Queries.GetDashboardTable;
 using Lumora.Application.Features.Consumer.Queries.GetEventById;
@@ -115,6 +116,17 @@ public class ConsumerProfileController(IMessageBus messageBus) : ControllerBase
     public async Task<ActionResult<GetEventForEditQueryResponse>> GetEventDetailsForEdit([FromRoute] Guid eventId, CancellationToken cancellationToken)
     {
         var result = await messageBus.InvokeAsync<Result<GetEventForEditQueryResponse>>(new GetEventForEditQuery(eventId), cancellationToken);
+        return result.ToActionResult(this);
+    }
+
+    [Authorize]
+    [HttpPatch("update/profile/information")]
+    [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<ActionResult<Guid>> UpdatePersonalInformation(UpdatePersonalInformationCommand command, CancellationToken cancellationToken)
+    {
+        var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken);
         return result.ToActionResult(this);
     }
 

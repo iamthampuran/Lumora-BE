@@ -6,6 +6,7 @@ using Lumora.Application.Features.Auth.Commands.Initiate2FASetup;
 using Lumora.Application.Features.Auth.Commands.LogoutUser;
 using Lumora.Application.Features.Auth.Commands.SignInUser;
 using Lumora.Application.Features.Auth.Commands.SignupAccount;
+using Lumora.Application.Features.Auth.Commands.UpdatePassword;
 using Lumora.Application.Features.Auth.Commands.Verify2FALogin;
 using Lumora.Application.Features.Auth.Commands.VerifyAndEnable2FA;
 using Lumora.Application.Features.Auth.Queries.GetConsumerData;
@@ -128,6 +129,17 @@ namespace Lumora.Api.Controllers
             return result.ToActionResult(this);
         }
 
+        [Authorize]
+        [HttpPatch("change-password")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType ((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Guid>> ChangePassword(UpdatePasswordCommand command, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
 
     }
 }
