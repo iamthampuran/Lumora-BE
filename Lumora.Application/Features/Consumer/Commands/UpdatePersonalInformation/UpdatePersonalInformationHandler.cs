@@ -1,18 +1,20 @@
 ﻿using Ardalis.Result;
 using Lumora.Application.Contracts.Common;
 using Lumora.Application.Contracts.Persistence;
+using Lumora.Application.Contracts.Services;
 using Lumora.Domain.Entities.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace Lumora.Application.Features.Consumer.Commands.UpdatePersonalInformation;
 
-public class UpdatePersonalInformationHandler(IGenericRepository<ConsumerProfile> consuperProfileRepository, IUnitOfWork unitOfWork, ILogger<UpdatePersonalInformationHandler> logger)
+public class UpdatePersonalInformationHandler(IGenericRepository<ConsumerProfile> consuperProfileRepository, IUnitOfWork unitOfWork, ILogger<UpdatePersonalInformationHandler> logger, 
+    ICurrentUserService currentUserService)
 {
     public async Task<Result<Guid>> Handle(UpdatePersonalInformationCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("Handling command - {@command}", nameof(UpdatePersonalInformationCommand));
 
-        var userDetails = unitOfWork.GetCurrentUserDetails();
+        var userDetails = currentUserService.GetCurrentUserDetails();
 
         if (userDetails == null || userDetails.ConsumerId == null)
             return Result.Unauthorized("Current user is not consumer or not found");

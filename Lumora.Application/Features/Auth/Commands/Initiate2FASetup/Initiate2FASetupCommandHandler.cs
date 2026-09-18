@@ -6,11 +6,11 @@ using Lumora.Application.Services;
 
 namespace Lumora.Application.Features.Auth.Commands.Initiate2FASetup;
 
-public class Initiate2FASetupCommandHandler(IUnitOfWork unitOfWork, ITwoFactorAuthService twoFactoAuthService, IUserRepository userRepository, IAuthService authService)
+public class Initiate2FASetupCommandHandler(ITwoFactorAuthService twoFactoAuthService, IUserRepository userRepository, IAuthService authService, ICurrentUserService currentUserService)
 {
     public async Task<Result<Initiate2FASetupResponse>> Handle(Initiate2FASetupCommand command, CancellationToken cancellationToken)
     {
-        var userDetails = unitOfWork.GetCurrentUserDetails();
+        var userDetails = currentUserService.GetCurrentUserDetails();
         if (userDetails == null)
             return Result.Unauthorized();
 

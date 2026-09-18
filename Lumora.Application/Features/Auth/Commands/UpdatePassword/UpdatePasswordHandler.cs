@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Lumora.Application.Features.Auth.Commands.UpdatePassword;
 
-public class UpdatePasswordHandler(ILogger<UpdatePasswordCommand> logger, IUserRepository userRepository, IUnitOfWork unitOfWork, IAuthService authService)
+public class UpdatePasswordHandler(ILogger<UpdatePasswordCommand> logger, IUserRepository userRepository, IUnitOfWork unitOfWork, IAuthService authService, ICurrentUserService currentUserService)
 {
     public async Task<Result<Guid>> Handle(UpdatePasswordCommand command, CancellationToken cancellationToken)
     {
         logger.LogInformation("Handling command - {@command}", nameof(UpdatePasswordCommand));
-        var userDetails = unitOfWork.GetCurrentUserDetails();
+        var userDetails = currentUserService.GetCurrentUserDetails();
         if (userDetails == null) return Result.Unauthorized("User is not logged in");
 
         var user = await userRepository.GetByIdAsync(userDetails.UserId, cancellationToken);
