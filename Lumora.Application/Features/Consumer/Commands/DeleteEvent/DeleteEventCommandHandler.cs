@@ -1,12 +1,13 @@
 ﻿using Ardalis.Result;
 using Lumora.Application.Contracts.Common;
 using Lumora.Application.Contracts.Persistence;
+using Lumora.Application.Contracts.Services;
 using Lumora.Domain.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace Lumora.Application.Features.Consumer.Commands.DeleteEvent;
 
-public class DeleteEventCommandHandler(ILogger<DeleteEventCommandHandler> logger, IEventRepository eventRepository, IUnitOfWork unitOfWork)
+public class DeleteEventCommandHandler(ILogger<DeleteEventCommandHandler> logger, IEventRepository eventRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
 {
     public async Task<Result<Guid>> Handle(DeleteEventCommand command, CancellationToken cancellationToken)
     {
@@ -18,7 +19,7 @@ public class DeleteEventCommandHandler(ILogger<DeleteEventCommandHandler> logger
             return Result.NotFound("Event with the id was not found");
         }
 
-        var userData = unitOfWork.GetCurrentUserDetails();
+        var userData = currentUserService.GetCurrentUserDetails();
         if (userData == null || (userData.ConsumerId != null && userData.ConsumerId != eventData.ConsumerId))
         {
             return Result.Unauthorized("User not allowed to delete");

@@ -1,12 +1,13 @@
 ﻿using Ardalis.Result;
 using Lumora.Application.Contracts.Common;
 using Lumora.Application.Contracts.Persistence;
+using Lumora.Application.Contracts.Services;
 using Lumora.Domain.Entities.Event;
 using Lumora.Domain.Enums;
 
 namespace Lumora.Application.Features.Consumer.Commands.UpdateEvent;
 
-public class UpdateEventCommandHandler(IEventRepository eventRepository, IEventTypeRepository eventTypeRepository, IUnitOfWork unitOfWork)
+public class UpdateEventCommandHandler(IEventRepository eventRepository, IEventTypeRepository eventTypeRepository, IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
 {
     public async Task<Result<Guid>> Handle(UpdateEventCommand command, CancellationToken cancellationToken)
     {
@@ -21,7 +22,7 @@ public class UpdateEventCommandHandler(IEventRepository eventRepository, IEventT
             return Result.Error("Cannot update event with accepted inquiries.");
         }
 
-        var userDetails = unitOfWork.GetCurrentUserDetails();
+        var userDetails = currentUserService.GetCurrentUserDetails();
 
         if (userDetails is null || userDetails.ConsumerId is null)
         {

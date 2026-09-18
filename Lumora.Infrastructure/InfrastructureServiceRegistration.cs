@@ -34,6 +34,7 @@ public static class InfrastructureServiceRegistration
         //application services registration
         services.AddScoped<IMinioService, MinioService>();
         services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         //repository registration
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

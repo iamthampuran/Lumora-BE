@@ -5,11 +5,11 @@ using Lumora.Application.Contracts.Services;
 
 namespace Lumora.Application.Features.Auth.Queries.GetConsumerData;
 
-public class GetConsumerDataQueryHandler(IUserRepository userRepository, IMinioService minioService, IUnitOfWork unitOfWork)
+public class GetConsumerDataQueryHandler(IUserRepository userRepository, IMinioService minioService, ICurrentUserService currentUserservice)
 {
     public async Task<Result<GetConsumerDataResponse>> Handle(GetConsumerDataQuery query, CancellationToken cancellationToken)
     {
-        var userDetails = unitOfWork.GetCurrentUserDetails();
+        var userDetails = currentUserservice.GetCurrentUserDetails();
         if (userDetails == null)
             return Result.Unauthorized("User not authorized");
 

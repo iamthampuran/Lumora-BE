@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Lumora.Application.Contracts.Common;
 using Lumora.Application.Contracts.Persistence;
+using Lumora.Application.Contracts.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Lumora.Application.Features.Consumer.Queries.GetEventForEdit;
@@ -9,7 +10,7 @@ public class GetEventForEditQueryHandler(
     ILogger<GetEventForEditQueryHandler> logger,
     IEventRepository eventRepository,
     ITagRepository tagRepository, // 1. Inject ITagRepository
-    IUnitOfWork unitOfWork)
+    ICurrentUserService currentUserService)
 {
     public async Task<Result<GetEventForEditQueryResponse>> Handle(GetEventForEditQuery query, CancellationToken cancellationToken)
     {
@@ -29,7 +30,7 @@ public class GetEventForEditQueryHandler(
             return Result.NotFound();
         }
 
-        var details = unitOfWork.GetCurrentUserDetails();
+        var details = currentUserService.GetCurrentUserDetails();
 
         // 3. Extract the active TagIds from the event
         var activeTagIds = existingEvent.EventTags

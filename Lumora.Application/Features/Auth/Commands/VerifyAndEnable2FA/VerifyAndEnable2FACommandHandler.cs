@@ -1,15 +1,16 @@
 ﻿using Ardalis.Result;
 using Lumora.Application.Contracts.Common;
 using Lumora.Application.Contracts.Persistence;
+using Lumora.Application.Contracts.Services;
 using Lumora.Application.Services;
 
 namespace Lumora.Application.Features.Auth.Commands.VerifyAndEnable2FA;
 
-public class VerifyAndEnable2FACommandHandler(IUnitOfWork unitOfWork, IUserRepository userRepository, ITwoFactorAuthService twoFactorAuthService)
+public class VerifyAndEnable2FACommandHandler(IUnitOfWork unitOfWork, IUserRepository userRepository, ITwoFactorAuthService twoFactorAuthService, ICurrentUserService currentUserService)
 {
     public async Task<Result<List<string>>> Handle(VerifyAndEnable2FACommand command, CancellationToken cancellationToken)
     {
-        var userDetails = unitOfWork.GetCurrentUserDetails();
+        var userDetails = currentUserService.GetCurrentUserDetails();
         if (userDetails is null) return Result<List<string>>.Unauthorized();
 
         var user = await userRepository.GetByIdAsync(userDetails.UserId, cancellationToken);
