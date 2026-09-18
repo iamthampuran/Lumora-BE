@@ -6,9 +6,12 @@ using Lumora.Application.Features.Studio.Commands.AddTagsToStudio;
 using Lumora.Application.Features.Studio.Commands.UpdateCover;
 using Lumora.Application.Features.Studio.Commands.UpdateLogo;
 using Lumora.Application.Features.Studio.Commands.UpdatePortfolioImage;
+using Lumora.Application.Features.Studio.Queries.GetInquiries;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
+using Lumora.Application.Helpers;
 using Lumora.Domain.Entities.Identity;
+using Lumora.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -103,6 +106,18 @@ namespace Lumora.Api.Controllers
         public async Task<ActionResult<GetStudioDetailsByIdResponse>> GetStudioDashboard([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var result = await messageBus.InvokeAsync<Result<GetStudioDetailsByIdResponse>>(new GetStudioDetailsByIdQuery(id), cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [Authorize]
+        [HttpGet("inquiry-list/{statusId}")]
+        [ProducesResponseType(typeof(GetInquiriesQueryResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        public async Task<ActionResult<GetInquiriesQueryResponse>> GetInquiriesForStudio([FromRoute] InquiryStatus statusId, [FromQuery] PaginationOptions? paginationOptions, 
+            [FromQuery] InquiryFilterOptions? filterOptions, CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<GetInquiriesQueryResponse>>(new GetInquiriesQuery(statusId, paginationOptions ?? new(), filterOptions), cancellationToken);
             return result.ToActionResult(this);
         }
     }
