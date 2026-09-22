@@ -12,6 +12,7 @@ using Lumora.Application.Features.Studio.Queries.GetInquiries;
 using Lumora.Application.Features.Studio.Queries.GetInquiryDetails;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
+using Lumora.Application.Features.Studio.Queries.GetStudioMembers;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Entities.Identity;
 using Lumora.Domain.Enums;
@@ -155,5 +156,18 @@ namespace Lumora.Api.Controllers
             var result = await messageBus.InvokeAsync<Ardalis.Result.Result<Guid>>(command, cancellationToken);
             return result.ToActionResult(this);
         }
+
+        [Authorize]
+        [HttpGet("members")]
+        [ProducesResponseType(typeof(IEnumerable<GetStudioMembersResponse>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        public async Task<ActionResult<IEnumerable<GetStudioMembersResponse>>> GetStudioMembers(CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<IEnumerable<GetStudioMembersResponse>>>(new GetStudioMembersQuery(), cancellationToken);
+            return result.ToActionResult(this);
+        }
+
     }
 }
