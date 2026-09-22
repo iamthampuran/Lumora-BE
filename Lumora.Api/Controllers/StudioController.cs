@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Contracts.Common;
+using Lumora.Application.Features.Studio.Commands.AcceptInquiry;
 using Lumora.Application.Features.Studio.Commands.AddEmployees;
 using Lumora.Application.Features.Studio.Commands.AddPortfolioImage;
 using Lumora.Application.Features.Studio.Commands.AddTagsToStudio;
@@ -142,6 +143,17 @@ namespace Lumora.Api.Controllers
             }
 
             return BadRequest(result.Errors);
+        }
+
+        [Authorize]
+        [HttpPatch("inquiries/{inquiryId}/respond")]
+        public async Task<ActionResult<Guid>> RespondToInquiry([FromRoute] Guid inquiryId, [FromBody] AcceptInquiryCommand command, CancellationToken cancellationToken)
+        {
+            if (command.InquiryId != inquiryId)
+                return BadRequest("Inquiry id on the url is not the same as the one in body.");
+
+            var result = await messageBus.InvokeAsync<Ardalis.Result.Result<Guid>>(command, cancellationToken);
+            return result.ToActionResult(this);
         }
     }
 }
