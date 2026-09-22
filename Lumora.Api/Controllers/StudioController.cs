@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
+using Lumora.Application.Contracts.Common;
 using Lumora.Application.Features.Studio.Commands.AddEmployees;
 using Lumora.Application.Features.Studio.Commands.AddPortfolioImage;
 using Lumora.Application.Features.Studio.Commands.AddTagsToStudio;
@@ -7,6 +8,7 @@ using Lumora.Application.Features.Studio.Commands.UpdateCover;
 using Lumora.Application.Features.Studio.Commands.UpdateLogo;
 using Lumora.Application.Features.Studio.Commands.UpdatePortfolioImage;
 using Lumora.Application.Features.Studio.Queries.GetInquiries;
+using Lumora.Application.Features.Studio.Queries.GetInquiryDetails;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
 using Lumora.Application.Helpers;
@@ -16,6 +18,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Wolverine;
+using Wolverine.Runtime;
 namespace Lumora.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -119,6 +122,26 @@ namespace Lumora.Api.Controllers
         {
             var result = await messageBus.InvokeAsync<Result<GetInquiriesQueryResponse>>(new GetInquiriesQuery(statusId, paginationOptions ?? new(), filterOptions), cancellationToken);
             return result.ToActionResult(this);
+        }
+
+        [Authorize]
+        [HttpGet("inquiries/{inquiryId}")]
+        public async Task<IActionResult> GetInquiryDetails([FromRoute] Guid inquiryId)
+        {
+            var query = new GetInquiryDetailsQuery(inquiryId);
+            var result = await messageBus.InvokeAsync<Ardalis.Result.Result<GetInquiryDetailsResponse>>(query);
+
+            if (result.IsSuccess)
+            {
+                return Ok(result.Value);
+            }
+
+            if (result.Status == Ardalis.Result.ResultStatus.NotFound)
+            {
+                return NotFound(result.Errors);
+            }
+
+            return BadRequest(result.Errors);
         }
     }
 }
