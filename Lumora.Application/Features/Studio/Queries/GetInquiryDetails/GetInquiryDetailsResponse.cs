@@ -7,7 +7,8 @@ public record GetInquiryDetailsResponse(Guid InquiryId,
     decimal QuotedAmount,
     EventDetails Event,
     ConsumerDetails Consumer,
-    PaymentSummary? Payment);
+    PaymentSummary? Payment,
+    List<AssignedEmployeeDto> AssignedEmployees);
 
 public record EventDetails(
     string Title,
@@ -38,3 +39,5 @@ public record PaymentSummary(
     string? PaymentMethod,
     DateTime? PaidAt
 );
+
+public record AssignedEmployeeDto(Guid EmployeeId, string FullName, string EmployeeRole);

@@ -100,7 +100,8 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
                 i.Studio.StudioName,
                 i.Studio.LogoUrl,
                 i.Status,
-                i.QuotedAmount,
+                AssignedEmployees = i.InquiryEmployees,
+                Amount = i.QuotedAmount ?? i.Studio.MinPrice,
                 i.ModifiedAt
             })
             .ToListAsync(cancellationToken);
@@ -116,8 +117,13 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
                 i.StudioName,
                 profileUrl,
                 i.Status.ToString(),
-                i.QuotedAmount,
-                i.ModifiedAt);
+                i.Amount ,
+                i.ModifiedAt,
+                i.AssignedEmployees.Select(ae => new AssignedEmployeeDto(
+                ae.Employee.Id,
+                ae.Employee.FullName,
+                ae.Employee.EmployeeRole
+            )).ToList());
         }));
 
         var eventDetails = await query
@@ -129,7 +135,8 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
                 e.SpecialRequirements,
                 e.Title,
                 e.EventDate,
-                e.Location))
+                e.Location,
+                e.Status))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (eventDetails is null)

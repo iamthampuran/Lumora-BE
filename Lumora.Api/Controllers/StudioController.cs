@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using Ardalis.Result.AspNetCore;
 using Lumora.Application.Contracts.Common;
+using Lumora.Application.Features.Studio.Commands.AcceptInquiry;
 using Lumora.Application.Features.Studio.Commands.AddEmployees;
 using Lumora.Application.Features.Studio.Commands.AddPortfolioImage;
 using Lumora.Application.Features.Studio.Commands.AddTagsToStudio;
@@ -11,6 +12,7 @@ using Lumora.Application.Features.Studio.Queries.GetInquiries;
 using Lumora.Application.Features.Studio.Queries.GetInquiryDetails;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
+using Lumora.Application.Features.Studio.Queries.GetStudioMembers;
 using Lumora.Application.Helpers;
 using Lumora.Domain.Entities.Identity;
 using Lumora.Domain.Enums;
@@ -143,5 +145,29 @@ namespace Lumora.Api.Controllers
 
             return BadRequest(result.Errors);
         }
+
+        [Authorize]
+        [HttpPatch("inquiries/{inquiryId}/respond")]
+        public async Task<ActionResult<Guid>> RespondToInquiry([FromRoute] Guid inquiryId, [FromBody] AcceptInquiryCommand command, CancellationToken cancellationToken)
+        {
+            if (command.InquiryId != inquiryId)
+                return BadRequest("Inquiry id on the url is not the same as the one in body.");
+
+            var result = await messageBus.InvokeAsync<Ardalis.Result.Result<Guid>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [Authorize]
+        [HttpGet("members")]
+        [ProducesResponseType(typeof(IEnumerable<GetStudioMembersResponse>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        public async Task<ActionResult<IEnumerable<GetStudioMembersResponse>>> GetStudioMembers(CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<IEnumerable<GetStudioMembersResponse>>>(new GetStudioMembersQuery(), cancellationToken);
+            return result.ToActionResult(this);
+        }
+
     }
 }

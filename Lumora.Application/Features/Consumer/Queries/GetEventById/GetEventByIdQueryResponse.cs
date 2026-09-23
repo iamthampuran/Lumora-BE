@@ -1,8 +1,12 @@
 ﻿using Lumora.Domain.Entities.Common.ValueObjects;
+using Lumora.Domain.Enums;
 
 namespace Lumora.Application.Features.Consumer.Queries.GetEventById;
 
 public record GetEventByIdQueryResponse(IEnumerable<InquiryDetails> InquiryDetails, EventInformationDetails EventInformationDetails);
 
-public record InquiryDetails(Guid Id, string StudioName, string ProfileUrl, string InquiryStatus, decimal? Amount, DateTime LastUpdated);
-public record EventInformationDetails(string Category, decimal Duration, decimal Budget, List<string> Tags, string? AdditionalInformation, string Title, DateOnly EventDate, Coordinates Location);
+public record InquiryDetails(Guid Id, string StudioName, string ProfileUrl, string InquiryStatus, decimal? Amount, DateTime LastUpdated, List<AssignedEmployeeDto> AssignedEmployees);
+public record EventInformationDetails(string Category, decimal Duration, decimal Budget, List<string> Tags, string? AdditionalInformation, string Title, DateOnly EventDate, 
+    Coordinates Location, EventStatus Status);
+
+public record AssignedEmployeeDto(Guid EmployeeId, string FullName, string EmployeeRole);

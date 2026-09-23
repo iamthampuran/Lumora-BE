@@ -1,4 +1,5 @@
 ﻿using Lumora.Domain.Entities.Common;
+using Lumora.Domain.Entities.Event;
 using Lumora.Domain.Entities.Identity;
 
 namespace Lumora.Domain.Entities.Studio;
@@ -13,4 +14,5 @@ public class Employee : BaseEntity
 
     //navigation property
     public virtual StudioProfile Studio { get; set; } = null!;
+    public virtual ICollection<InquiryEmployee> Inquiries { get; set; }
 }

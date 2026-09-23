@@ -26,6 +26,6 @@ public class Inquiry : BaseEntity
     public virtual Gallery? Gallery { get; set; } 
     public virtual Payment? Payment { get; set; }
     public virtual ICollection<Review> Reviews { get; set; } = [];
-    
+    public virtual ICollection<InquiryEmployee> InquiryEmployees { get; set; } = [];
 
 }

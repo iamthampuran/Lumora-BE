@@ -151,7 +151,8 @@ public class InquiryRepository : GenericRepository<Inquiry>, IInquiryRepository
                     PriorBookings = _appDbContext.Inquiries.Count(prev =>
                         prev.ConsumerId == i.ConsumerId && prev.Status == Domain.Enums.InquiryStatus.Confirmed)
                 },
-                Payment = _appDbContext.Payments.FirstOrDefault(p => p.InquiryId == i.Id)
+                Payment = _appDbContext.Payments.FirstOrDefault(p => p.InquiryId == i.Id),
+                AssignedEmployees = i.InquiryEmployees
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -198,7 +199,12 @@ public class InquiryRepository : GenericRepository<Inquiry>, IInquiryRepository
                 inquiry.Consumer.PriorBookings,
                 inquiry.Consumer.PriorBookings > 0 ? "Elite" : "New Client"
             ),
-            paymentSummary
+            paymentSummary,
+            inquiry.AssignedEmployees.Select(ae => new AssignedEmployeeDto(
+            ae.Employee.Id,
+            ae.Employee.FullName,
+            ae.Employee.EmployeeRole
+        )).ToList()
         );
     }
 }

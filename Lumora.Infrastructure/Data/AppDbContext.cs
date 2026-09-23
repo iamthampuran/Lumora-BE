@@ -30,6 +30,7 @@ public class AppDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<EventType> EventTypes { get; set; }
     public DbSet<EventTag> EventTags { get; set; }
+    public DbSet<InquiryEmployee> InquiryEmployees { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,6 +52,7 @@ public class AppDbContext : DbContext
         modelBuilder.ConfigureEventType();
         modelBuilder.ConfigureEventTag();
         modelBuilder.ConfigureStudioTag();
+        modelBuilder.ConfigureInquiryEmployee();
     }
 
 }
