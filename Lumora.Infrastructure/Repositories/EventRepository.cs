@@ -100,6 +100,7 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
                 i.Studio.StudioName,
                 i.Studio.LogoUrl,
                 i.Status,
+                AssignedEmployees = i.InquiryEmployees,
                 Amount = i.QuotedAmount ?? i.Studio.MinPrice,
                 i.ModifiedAt
             })
@@ -117,7 +118,12 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
                 profileUrl,
                 i.Status.ToString(),
                 i.Amount ,
-                i.ModifiedAt);
+                i.ModifiedAt,
+                i.AssignedEmployees.Select(ae => new AssignedEmployeeDto(
+                ae.Employee.Id,
+                ae.Employee.FullName,
+                ae.Employee.EmployeeRole
+            )).ToList());
         }));
 
         var eventDetails = await query
