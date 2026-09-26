@@ -50,7 +50,8 @@ public class AuthService(IOptions<AppSettingsConfiguration> options, IRefreshTok
                     user.StudioProfile.LogoUrl is not null &&
                     user.StudioProfile.Employees.Count > 0 &&
                     user.StudioProfile.Tags.Count > 0 &&
-                    user.StudioProfile.PortfolioImages.Count > 0;
+                    user.StudioProfile.PortfolioImages.Count > 0 &&
+                    user.StudioProfile.PayoutUpiId is not null;
 
             claims.Add(new Claim(
                 "isProfileComplete",
