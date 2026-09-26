@@ -27,11 +27,13 @@ public class AddPaymentInformationHandler(ILogger<AddPaymentInformationCommand> 
         if (studio == null)
             return Result.NotFound("User not found with the studio id");
 
-        var upiId = ExtractUPIFromQRCode(command.QrInformation!.FileStream);
+        string? upiId = command.UpiId;
+        if (command.QrInformation != null)
+            upiId = ExtractUPIFromQRCode(command.QrInformation!.FileStream);
         if (upiId == null)
             return Result.Error("Error processing the image");
 
-        studio.PayoutUpiId = command.UpiId == null ? upiId : command.UpiId;
+        studio.PayoutUpiId = upiId;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -39,8 +41,10 @@ public class AddPaymentInformationHandler(ILogger<AddPaymentInformationCommand> 
         
     }
 
-    private string? ExtractUPIFromQRCode(Stream stream)
+    private string? ExtractUPIFromQRCode(Stream? stream)
     {
+        if(stream == null)
+            return null;
         try
         {
             stream.Seek(0, SeekOrigin.Begin);
@@ -67,6 +71,7 @@ public class AddPaymentInformationHandler(ILogger<AddPaymentInformationCommand> 
 
                 // Extract UPI ID from QR data
                 var upiData = result.Text;
+                Console.WriteLine($"Decoded UPI data: {upiData}");
                 if (upiData.StartsWith("upi://", StringComparison.OrdinalIgnoreCase))
                 {
                     var uri = new Uri(upiData);
