@@ -1,4 +1,5 @@
 using Lumora.Api.Handlers;
+using Lumora.Api.Hubs;
 using Lumora.Application;
 using Lumora.Application.Configuration;
 using Lumora.Infrastructure;
@@ -121,6 +122,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddSignalR();
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -137,6 +141,8 @@ app.UseAuthorization();
 
 app.UseExceptionHandler();
 app.MapControllers();
+
+app.MapHub<PaymentHub>("/hubs/payment");
 
 using (var scope = app.Services.CreateScope())
 {

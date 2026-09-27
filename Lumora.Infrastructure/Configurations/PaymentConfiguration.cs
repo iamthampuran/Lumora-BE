@@ -14,8 +14,8 @@ public static class PaymentConfiguration
         entity.Property(p => p.InquiryId)
             .IsRequired();
 
-        entity.Property(p => p.EventId)
-            .IsRequired();
+        //entity.Property(p => p.EventId)
+        //    .IsRequired();
 
         entity.Property(p => p.StudioId)
             .IsRequired();
@@ -60,10 +60,10 @@ public static class PaymentConfiguration
             .HasForeignKey(p => p.StudioId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        entity.HasOne(p => p.Event)
-            .WithMany()
-            .HasForeignKey(p => p.EventId)
-            .OnDelete(DeleteBehavior.Restrict);
+        //entity.HasOne(p => p.Event)
+        //    .WithMany()
+        //    .HasForeignKey(p => p.EventId)
+        //    .OnDelete(DeleteBehavior.Restrict);
 
         //unique constraint
         entity.HasIndex(p => p.RazorPayOrderId)
@@ -71,9 +71,9 @@ public static class PaymentConfiguration
 
 
         //indexing for queries
-        entity.HasIndex(p => p.Status);
-        entity.HasIndex(p => p.StudioId);
-        entity.HasIndex(p => p.EventId);
+        //entity.HasIndex(p => p.Status);
+        //entity.HasIndex(p => p.StudioId);
+        //entity.HasIndex(p => p.EventId);
 
         entity.HasQueryFilter(p => p.IsActive && p.DeletedAt == null);
 
