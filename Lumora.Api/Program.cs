@@ -1,7 +1,9 @@
 using Lumora.Api.Handlers;
 using Lumora.Api.Hubs;
+using Lumora.Api.Services;
 using Lumora.Application;
 using Lumora.Application.Configuration;
+using Lumora.Application.Contracts.Services;
 using Lumora.Infrastructure;
 using Lumora.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -59,6 +61,7 @@ builder.Services.AddProblemDetails();
 
 builder.Host.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddScoped<IPaymentNotificationService, PaymentNotificationService>();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Security:Jwt");
@@ -139,10 +142,11 @@ app.UseCors("AllowFrontEnd");
 app.UseAuthentication();  // MUST come before UseAuthorization()
 app.UseAuthorization();
 
+app.MapHub<PaymentHub>("/hubs/payment");
+
 app.UseExceptionHandler();
 app.MapControllers();
 
-app.MapHub<PaymentHub>("/hubs/payment");
 
 using (var scope = app.Services.CreateScope())
 {
