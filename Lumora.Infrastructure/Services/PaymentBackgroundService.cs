@@ -59,7 +59,7 @@ public class PaymentBackgroundService(PaymentQueue queue, IServiceScopeFactory s
 
                 foreach (var inquiryData in inquiries.Where(i => i.Id != payment.InquiryId).ToList())
                 {
-                    inquiryData.Status = InquiryStatus.Rejected;
+                    inquiryData.Status = InquiryStatus.Cancelled;
                 }
 
                 //var inquiry = await inquiryRepository.GetByIdAsync(payment.InquiryId, cancellationToken);
