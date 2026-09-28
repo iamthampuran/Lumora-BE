@@ -3,6 +3,7 @@ using Ardalis.Result.AspNetCore;
 using Lumora.Application.Contracts.Common;
 using Lumora.Application.Features.Studio.Commands.AcceptInquiry;
 using Lumora.Application.Features.Studio.Commands.AddEmployees;
+using Lumora.Application.Features.Studio.Commands.AddPaymentInformation;
 using Lumora.Application.Features.Studio.Commands.AddPortfolioImage;
 using Lumora.Application.Features.Studio.Commands.AddTagsToStudio;
 using Lumora.Application.Features.Studio.Commands.UpdateCover;
@@ -10,6 +11,7 @@ using Lumora.Application.Features.Studio.Commands.UpdateLogo;
 using Lumora.Application.Features.Studio.Commands.UpdatePortfolioImage;
 using Lumora.Application.Features.Studio.Queries.GetInquiries;
 using Lumora.Application.Features.Studio.Queries.GetInquiryDetails;
+using Lumora.Application.Features.Studio.Queries.GetPortfolioImages;
 using Lumora.Application.Features.Studio.Queries.GetProfileStatus;
 using Lumora.Application.Features.Studio.Queries.GetStudioDetailsById;
 using Lumora.Application.Features.Studio.Queries.GetStudioMembers;
@@ -166,6 +168,32 @@ namespace Lumora.Api.Controllers
         public async Task<ActionResult<IEnumerable<GetStudioMembersResponse>>> GetStudioMembers(CancellationToken cancellationToken)
         {
             var result = await messageBus.InvokeAsync<Result<IEnumerable<GetStudioMembersResponse>>>(new GetStudioMembersQuery(), cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [Authorize]
+        [HttpPatch("payment-information")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<Guid>> AddPaymentInformation(IFormFile? file, [FromForm] string? upiId, CancellationToken cancellationToken)
+        {
+            var command = new AddPaymentInformationCommand(upiId, file != null ? new QrInformation(file?.OpenReadStream(), file?.FileName, file?.ContentType) : null);
+            var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [Authorize]
+        [HttpGet("profile-images")]
+        [ProducesResponseType(typeof(IEnumerable<GetPortoflioImageResponse>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        public async Task<ActionResult<IEnumerable<GetPortoflioImageResponse>>> GetPortfolioImages(CancellationToken cancellationToken)
+        {
+            var result = await messageBus.InvokeAsync<Result<IEnumerable<GetPortoflioImageResponse>>>(new GetPorftolioImageQuery(), cancellationToken);
             return result.ToActionResult(this);
         }
 

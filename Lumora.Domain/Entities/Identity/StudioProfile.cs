@@ -25,6 +25,7 @@ public class StudioProfile : BaseEntity
     public int ReviewCount { get; set; }
     public decimal MinPrice { get; set; }
     public decimal MaxPrice { get; set; }
+    public string? PayoutUpiId { get; set; }
 
     //navigation
     public virtual User User { get; set; } = null!;
@@ -45,6 +46,7 @@ public class StudioProfile : BaseEntity
             new("Add Photography Styles",    "Select the styles and genres you specialize in.",          Tags.Count > 0),
             new("Add Team Members",          "Invite your team and collaborate on projects.",            Employees.Count > 0),
             new("Set Service Area",          "Define the locations and radius you serve.",               Location != null && ServiceRadius != null),
+            new("Set Payment Method", "Upload the qr or enter the upi id for payment", PayoutUpiId != null),
         };
 
         var completedCount = steps.Count(s => s.IsCompleted);

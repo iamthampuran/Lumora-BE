@@ -1,5 +1,6 @@
 ﻿using Lumora.Application.Contracts.Persistence;
 using Lumora.Application.Contracts.Services;
+using Lumora.Application.Features.Consumer.Commands.InitiatePayment;
 using Lumora.Application.Features.Consumer.Queries.GetInquiryWidget;
 using Lumora.Application.Features.Studio.Queries.GetInquiries;
 using Lumora.Application.Features.Studio.Queries.GetInquiryDetails;
@@ -19,6 +20,37 @@ public class InquiryRepository : GenericRepository<Inquiry>, IInquiryRepository
     {
         _appDbContext = appDbContext;
         _minioService = minioService;
+    }
+
+    public async Task<InquiryPaymentDetailsDto?> GetInquiryPaymentDetailsAsync(Guid inquiryId, Guid consumerId, CancellationToken cancellationToken)
+    {
+        var inquiry = await _appDbContext.Inquiries.AsNoTracking()
+            .Where(i => i.Id == inquiryId && i.ConsumerId == consumerId && i.IsActive)
+            .Select(i => new
+            {
+                i.Id,
+                StudioName = i.Studio.StudioName,
+                LogoUrl = i.Studio.LogoUrl,
+                AverageRating = i.Studio.AverageRating,
+                ReviewCount = i.Studio.ReviewCount,
+                StudioLocation = i.Studio.Location.LocationName,
+                Tags = i.Event.EventTags.Select(t => t.Tag.Name).ToList(),
+                EventTitle = i.Event.Title,
+                EventDate = i.Event.EventDate,
+                Duration = i.Event.Duration,
+                EventLocation = i.Event.Location.LocationName,
+                QuotedAmount = i.QuotedAmount,
+                PayoutUpiId = i.Studio.PayoutUpiId
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (inquiry == null)
+            return null;
+
+        var logoUrl = !string.IsNullOrEmpty(inquiry.LogoUrl) ? await _minioService.GeneratePresignedUrlAsync(inquiry.LogoUrl) : null;
+
+        return new InquiryPaymentDetailsDto(inquiry.Id, inquiry.StudioName, logoUrl, inquiry.AverageRating ?? 0, inquiry.ReviewCount, inquiry.StudioLocation, inquiry.Tags, inquiry.EventTitle, 
+            inquiry.EventDate, inquiry.Duration, inquiry.EventLocation, inquiry.QuotedAmount ?? 0, inquiry.PayoutUpiId);
     }
 
     public async Task<IEnumerable<GetInquiryWidgetResponse>> GetInquiryWidgetDetailsAsync(Guid consumerId, CancellationToken cancellationToken)

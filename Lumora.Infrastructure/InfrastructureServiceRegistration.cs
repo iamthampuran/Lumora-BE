@@ -35,6 +35,9 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IMinioService, MinioService>();
         services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddSingleton<PaymentQueue>();
+        services.AddSingleton<IPaymentQueue>(sp => sp.GetRequiredService<PaymentQueue>());
+        services.AddHostedService<PaymentBackgroundService>();
 
         //repository registration
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

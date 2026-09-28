@@ -3,6 +3,7 @@ using System;
 using Lumora.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Lumora.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260924071239_UpdatedPaymentDetails")]
+    partial class UpdatedPaymentDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -770,6 +773,9 @@ namespace Lumora.Infrastructure.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("FailureReason")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -825,11 +831,15 @@ namespace Lumora.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EventId");
+
                     b.HasIndex("InquiryId")
                         .IsUnique();
 
                     b.HasIndex("RazorPayOrderId")
                         .IsUnique();
+
+                    b.HasIndex("Status");
 
                     b.HasIndex("StudioId");
 
@@ -1479,6 +1489,12 @@ namespace Lumora.Infrastructure.Migrations
 
             modelBuilder.Entity("Lumora.Domain.Entities.Payments.Payment", b =>
                 {
+                    b.HasOne("Lumora.Domain.Entities.Event.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Lumora.Domain.Entities.Event.Inquiry", "Inquiry")
                         .WithOne("Payment")
                         .HasForeignKey("Lumora.Domain.Entities.Payments.Payment", "InquiryId")
@@ -1494,6 +1510,8 @@ namespace Lumora.Infrastructure.Migrations
                     b.HasOne("Lumora.Domain.Entities.Identity.StudioProfile", null)
                         .WithMany("Payments")
                         .HasForeignKey("StudioProfileId");
+
+                    b.Navigation("Event");
 
                     b.Navigation("Inquiry");
 

@@ -5,5 +5,6 @@ public enum InquiryStatus
     Submitted,
     Accepted,
     Confirmed,
-    Rejected
+    Rejected,
+    Cancelled,
 }

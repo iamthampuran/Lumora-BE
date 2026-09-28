@@ -11,6 +11,8 @@ public class AppSettingsConfiguration
     public MinIOConfig Minio {  get; set; } = null!;
     [ValidateObjectMembers]
     public SecurityConfig Security { get; set; } = null!;
+    [ValidateObjectMembers]
+    public RazorpayConfig Razorpay { get; set; } = null!;
 }
 
 public class ConnectionStringsConfig
@@ -55,4 +57,14 @@ public class JwtConfig
     public int AccessTokenExpiryMinutes { get; set; } 
     [Required]
     public int RefreshTokenExpiryHours { get; set; }
+}
+
+public class RazorpayConfig
+{
+    public string Key { get; set; } = string.Empty;
+    public string Secret { get; set; } = string.Empty;
+    public string MerchantUpiId { get; set; } = "lumora.razorpay@icici";
+    public decimal PlatformFeePercentage { get; set; } = 0.05m;
+    public int MinSimulationDelaySeconds { get; set; } = 5;
+    public int MaxSimulationDelaySeconds { get; set; } = 25;
 }

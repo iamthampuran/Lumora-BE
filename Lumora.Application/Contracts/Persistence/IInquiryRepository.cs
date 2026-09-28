@@ -1,4 +1,5 @@
-﻿using Lumora.Application.Features.Consumer.Queries.GetInquiryWidget;
+﻿using Lumora.Application.Features.Consumer.Commands.InitiatePayment;
+using Lumora.Application.Features.Consumer.Queries.GetInquiryWidget;
 using Lumora.Application.Features.Studio.Queries.GetInquiries;
 using Lumora.Application.Features.Studio.Queries.GetInquiryDetails;
 using Lumora.Application.Helpers;
@@ -19,4 +20,6 @@ public interface IInquiryRepository : IGenericRepository<Inquiry>
 
     // Add this to the existing interface
     Task<GetInquiryDetailsResponse?> GetStudioInquiryDetailsAsync(Guid studioId, Guid inquiryId, CancellationToken cancellationToken);
+
+    Task<InquiryPaymentDetailsDto?> GetInquiryPaymentDetailsAsync(Guid inquiryId, Guid consumerId, CancellationToken cancellationToken);
 }
