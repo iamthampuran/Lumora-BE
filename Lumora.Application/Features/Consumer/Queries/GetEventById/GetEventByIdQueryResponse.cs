@@ -9,4 +9,4 @@ public record InquiryDetails(Guid Id, string StudioName, string ProfileUrl, stri
 public record EventInformationDetails(string Category, decimal Duration, decimal Budget, List<string> Tags, string? AdditionalInformation, string Title, DateOnly EventDate, 
     Coordinates Location, EventStatus Status);
 
-public record AssignedEmployeeDto(Guid EmployeeId, string FullName, string EmployeeRole);
+public record AssignedEmployeeDto(Guid EmployeeId, string FullName, string EmployeeRole, string Phone);
