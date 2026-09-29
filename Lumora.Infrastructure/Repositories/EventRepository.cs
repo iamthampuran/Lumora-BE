@@ -100,7 +100,7 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
                 i.Studio.StudioName,
                 i.Studio.LogoUrl,
                 i.Status,
-                AssignedEmployees = i.InquiryEmployees,
+                AssignedEmployees = i.InquiryEmployees.Select(ie => ie.Employee),
                 Amount = i.QuotedAmount ?? i.Studio.MinPrice,
                 i.ModifiedAt
             })
@@ -120,9 +120,9 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
                 i.Amount ,
                 i.ModifiedAt,
                 i.AssignedEmployees.Select(ae => new AssignedEmployeeDto(
-                ae.Employee.Id,
-                ae.Employee.FullName,
-                ae.Employee.EmployeeRole
+                ae.Id,
+                ae.FullName,
+                ae.EmployeeRole
             )).ToList());
         }));
 
