@@ -1,4 +1,6 @@
-﻿namespace Lumora.Application.Features.Studio.Queries.GetInquiryDetails;
+﻿using Lumora.Domain.Enums;
+
+namespace Lumora.Application.Features.Studio.Queries.GetInquiryDetails;
 
 public record GetInquiryDetailsResponse(Guid InquiryId,
     string Status,
@@ -18,7 +20,8 @@ public record EventDetails(
     decimal Duration,
     decimal Budget,
     string SpecialRequirements,
-    List<string> Tags
+    List<string> Tags,
+    EventStatus Status
 );
 
 public record ConsumerDetails(
