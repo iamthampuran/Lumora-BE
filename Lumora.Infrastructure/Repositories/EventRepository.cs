@@ -122,7 +122,8 @@ public class EventRepository : GenericRepository<Event>, IEventRepository
                 i.AssignedEmployees.Select(ae => new AssignedEmployeeDto(
                 ae.Id,
                 ae.FullName,
-                ae.EmployeeRole
+                ae.EmployeeRole,
+                ae.Phone
             )).ToList());
         }));
 
