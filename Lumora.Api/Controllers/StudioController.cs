@@ -23,6 +23,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Wolverine;
 using Wolverine.Runtime;
+using Lumora.Application.Features.Studio.Commands.AssignInquiryEmployees;
+
 namespace Lumora.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -156,6 +158,22 @@ namespace Lumora.Api.Controllers
                 return BadRequest("Inquiry id on the url is not the same as the one in body.");
 
             var result = await messageBus.InvokeAsync<Ardalis.Result.Result<Guid>>(command, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
+        [Authorize]
+        [HttpPatch("inquiries/{inquiryId}/assign-members")]
+        [ProducesResponseType(typeof(Guid), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        public async Task<ActionResult<Guid>> AssignMembersToInquiry([FromRoute] Guid inquiryId, [FromBody] AssignInquiryEmployeesCommand command, CancellationToken cancellationToken)
+        {
+            if (command.InquiryId != inquiryId)
+                return BadRequest("Inquiry id on the url is not the same as the one in body.");
+
+            var result = await messageBus.InvokeAsync<Result<Guid>>(command, cancellationToken);
             return result.ToActionResult(this);
         }
 

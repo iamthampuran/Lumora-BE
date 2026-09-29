@@ -172,7 +172,8 @@ public class InquiryRepository : GenericRepository<Inquiry>, IInquiryRepository
                     i.Event.Duration,
                     i.Event.Budget,
                     i.Event.SpecialRequirements,
-                    Tags = i.Event.EventTags.Select(t => t.Tag.Name).ToList()
+                    Tags = i.Event.EventTags.Select(t => t.Tag.Name).ToList(),
+                    i.Event.Status
                 },
                 Consumer = new
                 {
@@ -184,7 +185,7 @@ public class InquiryRepository : GenericRepository<Inquiry>, IInquiryRepository
                         prev.ConsumerId == i.ConsumerId && prev.Status == Domain.Enums.InquiryStatus.Confirmed)
                 },
                 Payment = _appDbContext.Payments.FirstOrDefault(p => p.InquiryId == i.Id),
-                AssignedEmployees = i.InquiryEmployees
+                AssignedEmployees = i.InquiryEmployees.Select(ie => ie.Employee)
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -221,7 +222,8 @@ public class InquiryRepository : GenericRepository<Inquiry>, IInquiryRepository
                 inquiry.Event.Duration,
                 inquiry.Event.Budget,
                 inquiry.Event.SpecialRequirements ?? string.Empty,
-                inquiry.Event.Tags
+                inquiry.Event.Tags,
+                inquiry.Event.Status
             ),
             new ConsumerDetails(
                 inquiry.Consumer.Id,
@@ -233,9 +235,9 @@ public class InquiryRepository : GenericRepository<Inquiry>, IInquiryRepository
             ),
             paymentSummary,
             inquiry.AssignedEmployees.Select(ae => new AssignedEmployeeDto(
-            ae.Employee.Id,
-            ae.Employee.FullName,
-            ae.Employee.EmployeeRole
+            ae.Id,
+            ae.FullName,
+            ae.EmployeeRole
         )).ToList()
         );
     }
