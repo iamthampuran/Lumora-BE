@@ -99,14 +99,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
             query = query.Where(predicate);
         }
 
-        if (orderBy != null)
-        {
-            return await orderBy(query).FirstOrDefaultAsync(cancellationToken);
-        }
-
         if (includes != null)
         {
             query = includes.Aggregate(query, (current, include) => current.Include(include));
+        }
+
+        if (orderBy != null)
+        {
+            return await orderBy(query).FirstOrDefaultAsync(cancellationToken);
         }
 
         return await query.FirstOrDefaultAsync(cancellationToken);
