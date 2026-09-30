@@ -306,7 +306,7 @@ public class StudioRepository : GenericRepository<StudioProfile>, IStudioReposit
                 p.Status == PaymentStatus.Completed &&
                 p.CompletedAt >= currentMonthStart &&
                 p.CompletedAt < nextMonthStart)
-            .SumAsync(p => (decimal?)p.Amount, cancellationToken) ?? 0m;
+            .SumAsync(p => (decimal?)(p.Amount - p.PlatformFee), cancellationToken) ?? 0m;
 
         var latestThreeInquiries = await _appDbContext.Inquiries
             .AsNoTracking()
