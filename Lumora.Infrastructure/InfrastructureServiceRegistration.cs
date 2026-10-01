@@ -48,6 +48,7 @@ public static class InfrastructureServiceRegistration
         services.AddScoped<IInquiryRepository, InquiryRepository>();
         services.AddScoped<IEventTypeRepository, EventTypeRepository>();
         services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<IGalleryRepository, GalleryRepository>();
 
         return services;
 
